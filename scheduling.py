@@ -160,7 +160,7 @@ if __name__ == "__main__":
     expectedTime = data['expectedTime']
     penalty = data['penalty']
     endTimes = data['endTimes']
-    taskNames = data['taskNames']
+    taskNames = data['taskIDs']
     alg = int(data['alg'])
     result = schedule(Name=taskNames,P=expectedTime, D=endTimes, C=penalty,method=alg)
     print(json.dumps(result))
