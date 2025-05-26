@@ -15,10 +15,10 @@ export const scheduleTask = async (userID, algID) => {
         const expectedTime = [];
         const penalty = [];
         const endTimes = [];
-        const taskNames = [];
+        const taskIDs = [];
 
         let alg;
-        alg = algID; //選擇使用的演算法 1:GA 2:GA_2(總成本更低但更慢) 3:endTimes 4:penalty 5:expectedtime
+        alg = algID; //選擇使用的演算法 1:GA 2:GA_2(總成本更低但更慢) 3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
 
         const taskList = snapshot.docs
             .map(doc => {
@@ -46,9 +46,9 @@ export const scheduleTask = async (userID, algID) => {
             expectedTime.push(taskList[i].ExpectedTime),
             penalty.push(taskList[i].Penalty),
             endTimes.push((taskList[i].EndTime.getTime() - now.getTime()) / 1000), // 單位為秒 
-            taskNames.push(taskList[i].TaskName)
+            taskIDs.push(taskList[i].TaskID)
         };
-        const result = await callSchedule(expectedTime, penalty, endTimes, taskNames, alg);
+        const result = await callSchedule(expectedTime, penalty, endTimes, taskIDs, alg);
 
         return result;
 
@@ -59,7 +59,7 @@ export const scheduleTask = async (userID, algID) => {
 };
 
 //呼叫 Python 函式
-const callSchedule = (expectedTime, penalty, endTimes, taskNames, alg) => {
+const callSchedule = (expectedTime, penalty, endTimes, taskIDs, alg) => {
     return new Promise((resolve, reject) => {
         const python = spawn("python", ["scheduling.py"]);
 
@@ -67,7 +67,7 @@ const callSchedule = (expectedTime, penalty, endTimes, taskNames, alg) => {
             expectedTime,
             penalty,
             endTimes,
-            taskNames,
+            taskIDs,
             alg
         });
 
