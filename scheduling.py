@@ -63,74 +63,34 @@ def GA(P,D,C,pop_size=50, generations=500, cxr=0.8, mutr=0.2):
     best = min(pop, key=partial(total_weighted_tardiness,P=P,D=D,C=C))
     return best
 
-def GA_2(P,D,C,pop_size=50, generations=100, cxr=0.8, mutr=0.2):
-    '''
-    P 是完成各個作業預計花費的時間且長度為N的陣列  
-    D 是各個作業的截止時間且長度為N的陣列  
-    C 是各個作業未及時完成(接受遲交的時間內)處罰的參數且長度為N的陣列    
-    pop_size 為生成陣列的長度  
-    generations 為運算終止的條件  
-    cxr 為交叉機率  
-    mutr 為變異機率   
-
-    此函式會回傳作業完成的順序  
-    排程效果比GA好但較慢
-    '''
+def RANDOM(P,D,C,pop_size=50, generations=100, cxr=0.8, mutr=0.2):
     if not (len(P) == len(D) == len(C)):
         raise ValueError("參數 P, D, C的長度必須相同")
     elif len(P) == 0:
         raise ValueError("參數 P, D, C的長度必須大於零")
     
-    N = len(P)
-    pop = [random.sample(range(N), N) for _ in range(pop_size)]
-    count = 0
-    best = []
-    best_val = -1
-    while(count < generations):
-        pop = sorted(pop, key=partial(total_weighted_tardiness,P=P,D=D,C=C))
-        newpop = pop[:int(0.1*pop_size)] 
-        while len(newpop)<pop_size:
-            if random.random()<cxr:
-                p1,p2 = random.sample(pop[:20],2)
-                c = crossover(p1,p2)
-            else:
-                c = random.choice(pop)
-            mutate(c, mutr)
-            newpop.append(c)
-        pop = newpop
+    l = GA(P,D,C)
+    n = len(l)
+    selected = []
+    remaining = l.copy()
 
-        best_cand = min(pop, key=partial(total_weighted_tardiness,P=P,D=D,C=C))
-        best_val_cand = total_weighted_tardiness(best_cand,P,D,C)
-        if(best_val_cand < best_val or best_val < 0):
-            best = best_cand
-            best_val = best_val_cand
-            count = 0
-        elif(best_val_cand == 0):
-            best = best_cand
-            best_val = best_val_cand
-            break
-        else:
-            count += 1
-        
-    return best
+    # 依照 index 反比當作 weight，index 越小 weight 越大
+    def get_weights(items):
+        length = len(items)
+        return [length - i for i in range(length)]
 
-def end(D):
-    '''
-    截止日期越接近的作業排序越前面
-    '''
-    return sorted(range(len(D)), key=lambda k: D[k])
+    while remaining:
+        weights = get_weights(remaining)
+        total_weight = sum(weights)
+        r = random.uniform(0, total_weight)
+        acc = 0
+        for i, weight in enumerate(weights):
+            acc += weight
+            if r <= acc:
+                selected.append(remaining.pop(i))
+                break
 
-def cost(C):
-    '''
-    處罰成本越大的作業排序越前面
-    '''
-    return sorted(range(len(C)), key=lambda k: C[k],reverse=True)
-
-def process(P):
-    '''
-    預期花費時間越少的作業排序越前面
-    '''
-    return sorted(range(len(P)), key=lambda k: P[k])
+    return selected   
 
 def schedule(Name,P,D,C,method=1):
     seq = []
@@ -138,13 +98,13 @@ def schedule(Name,P,D,C,method=1):
     D2 = list(map(int, D))
     C2 = list(map(int, C))
     if(method == 2):
-        seq = GA_2(P=P2, D=D2, C=C2)
+        seq = RANDOM(P=P2, D=D2, C=C2)
     elif(method == 3):
-        seq = end(D=D2)
+        seq = sorted(range(len(D)), key=lambda k: D[k])
     elif(method == 4):
-        seq = cost(C=C2)
+        seq = sorted(range(len(C)), key=lambda k: C[k],reverse=True)
     elif(method == 5):
-        seq = process(P=P2)
+        seq = sorted(range(len(P)), key=lambda k: P[k])
     else:
         seq = GA(P=P2, D=D2, C=C2)
     outputID = []
