@@ -18,8 +18,9 @@ export const scheduleTask = async (userID, algID) => {
         const taskIDs = [];
 
         let alg;
-        alg = algID; //選擇使用的演算法 1:GA 2:GA_2(總成本更低但更慢) 3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
-
+        alg = algID; 
+        //alg  scheduling 1:J人排序 2:P人排序
+        //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
         const taskList = snapshot.docs
             .map(doc => {
                 const data = doc.data();
@@ -41,7 +42,7 @@ export const scheduleTask = async (userID, algID) => {
             .filter(task => task.Child.length == 0);
 
         const now = new Date();
-        //可能需要考慮一天有多少時間可以寫功課?
+
         for (var i = 0; i < taskList.length; i++) {
             expectedTime.push(taskList[i].ExpectedTime),
             penalty.push(taskList[i].Penalty),
@@ -60,6 +61,8 @@ export const scheduleTask = async (userID, algID) => {
 
 //呼叫 Python 函式
 const callSchedule = (expectedTime, penalty, endTimes, taskIDs, alg) => {
+    //alg  scheduling 1:J人排序 2:P人排序
+    //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
     return new Promise((resolve, reject) => {
         const python = spawn("python", ["scheduling.py"]);
 
