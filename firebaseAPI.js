@@ -1,5 +1,109 @@
-import { db } from "./firebaseConfig";
+import { db } from "./firebaseConfig.js";
 import { doc, collection, setDoc, getDocs, query, where, Timestamp, serverTimestamp } from "firebase/firestore";
+import { spawn } from "child_process";
+
+//讀取task的資料
+export const scheduleTask = async (userID, algID) => {
+    try {
+        const q = query(
+            collection(db, "Task"),
+            where("Member", "array-contains", userID),
+            where("State", "==", "On")
+        );
+
+        const snapshot = await getDocs(q);
+        const expectedTime = [];
+        const penalty = [];
+        const endTimes = [];
+        const taskIDs = [];
+
+        let alg;
+        alg = algID; 
+        //alg  scheduling 1:J人排序 2:P人排序
+        //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
+        const taskList = snapshot.docs
+            .map(doc => {
+                const data = doc.data();
+                return {
+                    TaskName: data.TaskName,
+                    EndTime: data.EndTime.toDate(),
+                    Penalty: data.Penalty,
+                    ExpectedTime: data.ExpectedTime,
+                    Child:  data.Child,
+                    Parent: data.Parent,
+                    TaskID: data.TaskID,
+                    UserID: userID,
+                    TaskDetail: data.TaskDetail,
+                    CreatedTime: data.CreatedTime.toDate(),
+                    State: data.State,
+                    Member: data.Member
+                };
+            })
+            .filter(task => task.Child.length == 0);
+
+        const now = new Date();
+
+        for (var i = 0; i < taskList.length; i++) {
+            expectedTime.push(taskList[i].ExpectedTime),
+            penalty.push(taskList[i].Penalty),
+            endTimes.push((taskList[i].EndTime.getTime() - now.getTime()) / 1000), // 單位為秒 
+            taskIDs.push(taskList[i].TaskID)
+        };
+        const result = await callSchedule(expectedTime, penalty, endTimes, taskIDs, alg);
+
+        return result;
+
+    } catch (error) {
+        console.error("讀取任務失敗：", error);
+        return [];
+    }
+};
+
+//呼叫 Python 函式
+const callSchedule = (expectedTime, penalty, endTimes, taskIDs, alg) => {
+    //alg  scheduling 1:J人排序 2:P人排序
+    //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
+    return new Promise((resolve, reject) => {
+        const python = spawn("python", ["scheduling.py"]);
+
+        const input = JSON.stringify({
+            expectedTime,
+            penalty,
+            endTimes,
+            taskIDs,
+            alg
+        });
+
+        let output = "";
+        let errorOutput = "";
+
+        python.stdout.on("data", (data) => {
+            output += data.toString();
+        });
+
+        python.stderr.on("data", (data) => {
+            errorOutput += data.toString();
+        });
+
+        python.on("close", (code) => {
+            if (code !== 0) {
+                console.error("Python script error:", errorOutput);
+                reject(errorOutput);
+            } else {
+                try {
+                    const parsed = JSON.parse(output);
+                    resolve(parsed);
+                } catch (err) {
+                    console.error("無法解析 Python 輸出：", output);
+                    reject(err);
+                }
+            }
+        });
+
+        python.stdin.write(input);
+        python.stdin.end();
+    });
+};
 
 
 //新增user（暫時用）
@@ -22,32 +126,49 @@ export const addUser = async ({ UserName }) => {
 };
 
 //新增task
-export const addTask = async ({ UserID, TaskName, TaskDetail, EndTime }) => {
+export const addTask = async ({
+    UserID,
+    TaskName,
+    TaskDetail,
+    EndTime,
+    Child = [],
+    Parent = "NULL",          // ✅ 是字串 "NULL"
+    Penalty = 0,
+    ExpectedTime = 60,
+    Member
+}) => {
     const docRef = doc(collection(db, "Task"));
     const TaskID = docRef.id;
     const State = "On";
 
+    const finalMember = Member ?? [UserID]; // 如果沒提供 Member，就預設為 [UserID]
+
     const data = {
         TaskID,
-        UserID,
         TaskName,
         TaskDetail,
         CreatedTime: serverTimestamp(),
         EndTime: Timestamp.fromDate(EndTime),
         State,
+        Child,
+        Parent,
+        Penalty,
+        ExpectedTime,
+        Member: finalMember
     };
 
     try {
         await setDoc(docRef, data);
-        return { success: true, id };
+        return { success: true, id: TaskID };
     } catch (error) {
+        console.error("新增任務失敗：", error);
         return { success: false, error };
     }
 };
 
 
 //新增subtask
-export const addSubTask = async ({ TopTaskID, ParentID, SubTaskName, SubTaskDetail, CreatedTime, EndTime }) => {
+/* export const addSubTask = async ({ TopTaskID, ParentID, SubTaskName, SubTaskDetail, CreatedTime, EndTime }) => {
     const docRef = doc(collection(db, "SubTask"));
     const SubTaskID = docRef.id;
     const State = "On";
@@ -69,7 +190,7 @@ export const addSubTask = async ({ TopTaskID, ParentID, SubTaskName, SubTaskDeta
     } catch (error) {
         return { success: false, error };
     }
-};
+}; */
 
 //新增meeting
 export const addMeeting = async ({ TaskID, MeetingName, MeetingDetail, StartTime, Duration }) => {
@@ -144,7 +265,7 @@ export const fetchUserTask = async (userID) => {
     try {
         const q = query(
             collection(db, "Task"),
-            where("UserID", "==", userID),
+            where("Member", "array-contains", userID),
             where("State", "==", "On")
         );
 
@@ -153,12 +274,13 @@ export const fetchUserTask = async (userID) => {
             const data = doc.data();
             return {
                 TaskID: data.TaskID,
-                UserID: data.UserID,
+                UserID: userID, // 保留參數命名一致性
                 TaskName: data.TaskName,
                 TaskDetail: data.TaskDetail,
                 CreatedTime: data.CreatedTime.toDate(),
                 EndTime: data.EndTime.toDate(),
                 State: data.State,
+                Member: data.Member // 加入 Member 陣列
             };
         });
         return taskList;
@@ -168,8 +290,9 @@ export const fetchUserTask = async (userID) => {
     }
 };
 
+
 //依據TaskID/SubTaskID獲取ChildSubTask
-export const fetchChildSubTask = async (parentID) => {
+/* export const fetchChildSubTask = async (parentID) => {
     try {
         const q = query(
             collection(db, "SubTask"),
@@ -196,10 +319,10 @@ export const fetchChildSubTask = async (parentID) => {
         console.error("讀取任務失敗：", error);
         return [];
     }
-};
+}; */
 
 //依據UserID獲取Group對應的Task
-export const fetchTaskGroup = async (userID) => {
+/* export const fetchTaskGroup = async (userID) => {
     try {
         // 先查詢所有屬於該 user 的 group
         const groupQuery = query(
@@ -250,10 +373,10 @@ export const fetchTaskGroup = async (userID) => {
         console.error("讀取會議失敗：", error);
         return [];
     }
-};
+}; */
 
 //依據TaskID獲取GroupMember
-export const fetchGroupMember = async (taskID) => {
+/* export const fetchGroupMember = async (taskID) => {
     try {
         // 先查詢所有屬於該 task 的 user
         const userQuery = query(
@@ -299,7 +422,7 @@ export const fetchGroupMember = async (taskID) => {
         console.error("讀取會議失敗：", error);
         return [];
     }
-};
+}; */
 
 
 
