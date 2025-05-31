@@ -1,109 +1,109 @@
 import { db } from "./firebaseConfig.js";
 import { doc, collection, setDoc, getDocs, query, where, Timestamp, serverTimestamp } from "firebase/firestore";
-import { spawn } from "child_process";
+// import { spawn } from "child_process";
 
-//讀取task的資料
-export const scheduleTask = async (userID, algID) => {
-    try {
-        const q = query(
-            collection(db, "Task"),
-            where("Member", "array-contains", userID),
-            where("State", "==", "On")
-        );
+// 讀取task的資料
+// export const scheduleTask = async (userID, algID) => {
+//     try {
+//         const q = query(
+//             collection(db, "Task"),
+//             where("Member", "array-contains", userID),
+//             where("State", "==", "On")
+//         );
 
-        const snapshot = await getDocs(q);
-        const expectedTime = [];
-        const penalty = [];
-        const endTimes = [];
-        const taskIDs = [];
+//         const snapshot = await getDocs(q);
+//         const expectedTime = [];
+//         const penalty = [];
+//         const endTimes = [];
+//         const taskIDs = [];
 
-        let alg;
-        alg = algID; 
-        //alg  scheduling 1:J人排序 2:P人排序
-        //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
-        const taskList = snapshot.docs
-            .map(doc => {
-                const data = doc.data();
-                return {
-                    TaskName: data.TaskName,
-                    EndTime: data.EndTime.toDate(),
-                    Penalty: data.Penalty,
-                    ExpectedTime: data.ExpectedTime,
-                    Child:  data.Child,
-                    Parent: data.Parent,
-                    TaskID: data.TaskID,
-                    UserID: userID,
-                    TaskDetail: data.TaskDetail,
-                    CreatedTime: data.CreatedTime.toDate(),
-                    State: data.State,
-                    Member: data.Member
-                };
-            })
-            .filter(task => task.Child.length == 0);
+//         let alg;
+//         alg = algID;
+//         //alg  scheduling 1:J人排序 2:P人排序
+//         //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
+//         const taskList = snapshot.docs
+//             .map(doc => {
+//                 const data = doc.data();
+//                 return {
+//                     TaskName: data.TaskName,
+//                     EndTime: data.EndTime.toDate(),
+//                     Penalty: data.Penalty,
+//                     ExpectedTime: data.ExpectedTime,
+//                     Child: data.Child,
+//                     Parent: data.Parent,
+//                     TaskID: data.TaskID,
+//                     UserID: userID,
+//                     TaskDetail: data.TaskDetail,
+//                     CreatedTime: data.CreatedTime.toDate(),
+//                     State: data.State,
+//                     Member: data.Member
+//                 };
+//             })
+//             .filter(task => task.Child.length == 0);
 
-        const now = new Date();
+//         const now = new Date();
 
-        for (var i = 0; i < taskList.length; i++) {
-            expectedTime.push(taskList[i].ExpectedTime),
-            penalty.push(taskList[i].Penalty),
-            endTimes.push((taskList[i].EndTime.getTime() - now.getTime()) / 1000), // 單位為秒 
-            taskIDs.push(taskList[i].TaskID)
-        };
-        const result = await callSchedule(expectedTime, penalty, endTimes, taskIDs, alg);
+//         for (var i = 0; i < taskList.length; i++) {
+//             expectedTime.push(taskList[i].ExpectedTime),
+//                 penalty.push(taskList[i].Penalty),
+//                 endTimes.push((taskList[i].EndTime.getTime() - now.getTime()) / 1000), // 單位為秒 
+//                 taskIDs.push(taskList[i].TaskID)
+//         };
+//         const result = await callSchedule(expectedTime, penalty, endTimes, taskIDs, alg);
 
-        return result;
+//         return result;
 
-    } catch (error) {
-        console.error("讀取任務失敗：", error);
-        return [];
-    }
-};
+//     } catch (error) {
+//         console.error("讀取任務失敗：", error);
+//         return [];
+//     }
+// };
 
-//呼叫 Python 函式
-const callSchedule = (expectedTime, penalty, endTimes, taskIDs, alg) => {
-    //alg  scheduling 1:J人排序 2:P人排序
-    //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
-    return new Promise((resolve, reject) => {
-        const python = spawn("python", ["scheduling.py"]);
+// //呼叫 Python 函式
+// const callSchedule = (expectedTime, penalty, endTimes, taskIDs, alg) => {
+//     //alg  scheduling 1:J人排序 2:P人排序
+//     //     基本排序    3:endTimes(作業截止時間越早越前面) 4:penalty(越重要越前面) 5:expectedtime(作業需要花費時間越短越前面)
+//     return new Promise((resolve, reject) => {
+//         const python = spawn("python", ["scheduling.py"]);
 
-        const input = JSON.stringify({
-            expectedTime,
-            penalty,
-            endTimes,
-            taskIDs,
-            alg
-        });
+//         const input = JSON.stringify({
+//             expectedTime,
+//             penalty,
+//             endTimes,
+//             taskIDs,
+//             alg
+//         });
 
-        let output = "";
-        let errorOutput = "";
+//         let output = "";
+//         let errorOutput = "";
 
-        python.stdout.on("data", (data) => {
-            output += data.toString();
-        });
+//         python.stdout.on("data", (data) => {
+//             output += data.toString();
+//         });
 
-        python.stderr.on("data", (data) => {
-            errorOutput += data.toString();
-        });
+//         python.stderr.on("data", (data) => {
+//             errorOutput += data.toString();
+//         });
 
-        python.on("close", (code) => {
-            if (code !== 0) {
-                console.error("Python script error:", errorOutput);
-                reject(errorOutput);
-            } else {
-                try {
-                    const parsed = JSON.parse(output);
-                    resolve(parsed);
-                } catch (err) {
-                    console.error("無法解析 Python 輸出：", output);
-                    reject(err);
-                }
-            }
-        });
+//         python.on("close", (code) => {
+//             if (code !== 0) {
+//                 console.error("Python script error:", errorOutput);
+//                 reject(errorOutput);
+//             } else {
+//                 try {
+//                     const parsed = JSON.parse(output);
+//                     resolve(parsed);
+//                 } catch (err) {
+//                     console.error("無法解析 Python 輸出：", output);
+//                     reject(err);
+//                 }
+//             }
+//         });
 
-        python.stdin.write(input);
-        python.stdin.end();
-    });
-};
+//         python.stdin.write(input);
+//         python.stdin.end();
+//     });
+// };
 
 
 //新增user（暫時用）

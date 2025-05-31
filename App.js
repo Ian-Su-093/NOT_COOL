@@ -8,6 +8,7 @@ import Home from './app/Home'
 import Dashboard from './app/Dashboard'
 import Meetings from './app/Meetings'
 import MeetingDetails from './app/MeetingDetails'
+import Tasks from './app/Tasks'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -32,6 +33,12 @@ const MeetingsStack = () => (
     </Stack.Navigator>
 )
 
+const TasksStack = () => (
+    <Stack.Navigator initialRouteName="Tasks">
+        <Stack.Screen name="Tasks" component={Tasks} options={{ headerShown: false }} />
+    </Stack.Navigator>
+)
+
 const App = () => {
     return (
         <NavigationContainer>
@@ -39,6 +46,7 @@ const App = () => {
                 <Tab.Screen name="首頁" component={HomeStack} />
                 <Tab.Screen name="儀表板" component={DashboardStack} />
                 <Tab.Screen name="會議" component={MeetingsStack} />
+                <Tab.Screen name="任務" component={TasksStack} />
             </Tab.Navigator>
         </NavigationContainer>
     )
