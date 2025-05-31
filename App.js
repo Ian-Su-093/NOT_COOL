@@ -18,8 +18,8 @@ const MainTabs = () => (
     <Tab.Navigator initialRouteName="儀表板" screenOptions={{ headerShown: false }}>
         <Tab.Screen name="首頁" component={HomeStack} />
         <Tab.Screen name="儀表板" component={DashboardStack} />
-        <Tab.Screen name="會議" component={MeetingsStack} />
         <Tab.Screen name="任務" component={TasksStack} />
+        <Tab.Screen name="會議" component={MeetingsStack} />
     </Tab.Navigator>
 )
 

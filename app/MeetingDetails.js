@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text, TextInput, Pressable } from "react-native"
 import { fetchUserTask, fetchTaskGroup } from "@/firebaseAPI"
 import { Picker } from "@react-native-picker/picker"
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import styles from "./MeetingDetails.styles"
 
@@ -13,7 +14,7 @@ const MeetingDetails = ({ route, navigation }) => {
 
     const fetchData = async () => {
         try {
-            const userID = "MI51nEam3GgPqbV7WQeP"
+            const userID = await AsyncStorage.getItem('userID')
             const [TasksData, TaskGroupData] = await Promise.all([
                 fetchUserTask(userID),
                 fetchTaskGroup(userID)

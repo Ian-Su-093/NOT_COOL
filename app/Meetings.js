@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text, Pressable } from "react-native"
 import { fetchUserMeeting } from "@/firebaseAPI";
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from "./Meetings.styles"
 
@@ -10,7 +11,7 @@ const Meetings = ({ navigation }) => {
 
     const fetchData = async () => {
         try {
-            const userID = "MI51nEam3GgPqbV7WQeP";
+            const userID = await AsyncStorage.getItem('userID');
             const MeetingData = await fetchUserMeeting(userID);
             setMeetings(MeetingData);
         } catch (error) {

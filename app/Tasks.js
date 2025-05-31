@@ -3,6 +3,7 @@ import { ScrollView, View, Text, Pressable } from "react-native"
 import styles from "./Tasks.styles"
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const backend_url =
     Platform.OS === 'web'
@@ -15,15 +16,16 @@ const Tasks = ({ navigation }) => {
     const [sortedBy, setSortedBy] = useState("deadline")
     const [showCompleted, setShowCompleted] = useState(false)
     const [showRootTasks, setShowRootTasks] = useState(true)
+    const [userID, setUserID] = useState(null);
 
     const getRootTasks = async () => {
-        const userID = "MI51nEam3GgPqbV7WQeP";
+        const userID = await AsyncStorage.getItem('userID');
         const res = await fetch(`${backend_url}/users/${userID}/tasks/root`);
         setRootTasks((await res.json()).tasks);
     }
 
     const getLeafTasks = async () => {
-        const userID = "MI51nEam3GgPqbV7WQeP";
+        const userID = await AsyncStorage.getItem('userID');
         const res = await fetch(`${backend_url}/users/${userID}/tasks/leaf`);
         setLeafTasks((await res.json()).tasks);
     }
@@ -31,6 +33,9 @@ const Tasks = ({ navigation }) => {
     useEffect(() => {
         getRootTasks()
         getLeafTasks()
+        AsyncStorage.getItem('userID').then(value => {
+            setUserID(value);
+        });
     }, [])
 
     return (
@@ -53,9 +58,9 @@ const Tasks = ({ navigation }) => {
                             const currentTasks = showRootTasks ? rootTasks : leafTasks;
                             const filteredTasks = currentTasks.filter((task) => {
                                 if (!showCompleted) {
-                                    return task.UnfinishedMember.includes("MI51nEam3GgPqbV7WQeP");
+                                    return task.UnfinishedMember.includes(userID);
                                 } else {
-                                    return !task.UnfinishedMember.includes("MI51nEam3GgPqbV7WQeP");
+                                    return !task.UnfinishedMember.includes(userID);
                                 }
                             });
 

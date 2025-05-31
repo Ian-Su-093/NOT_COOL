@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text } from "react-native"
 import { fetchUserMeeting, fetchUserTask } from "@/firebaseAPI";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from "./Dashboard.styles"
 
@@ -11,7 +12,7 @@ const Dashboard = ({ navigation }) => {
     // 從 Firestore 讀取資料
     const fetchData = async () => {
         try {
-            const userID = "MI51nEam3GgPqbV7WQeP";
+            const userID = await AsyncStorage.getItem('userID');
 
             const [TasksData, MeetingData] = await Promise.all([
                 fetchUserTask(userID),
