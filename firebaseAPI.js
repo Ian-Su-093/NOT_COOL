@@ -280,7 +280,10 @@ export const fetchUserTask = async (userID) => {
                 CreatedTime: data.CreatedTime.toDate(),
                 EndTime: data.EndTime.toDate(),
                 State: data.State,
-                Member: data.Member // 加入 Member 陣列
+                Member: data.Member, // 加入 Member 陣列
+                Penalty: data.Penalty,
+                ExpectedTime: data.ExpectedTime,
+                UnfinishedMember: data.UnfinishedMember
             };
         });
         return taskList;
@@ -289,142 +292,6 @@ export const fetchUserTask = async (userID) => {
         return [];
     }
 };
-
-
-//依據TaskID/SubTaskID獲取ChildSubTask
-/* export const fetchChildSubTask = async (parentID) => {
-    try {
-        const q = query(
-            collection(db, "SubTask"),
-            where("ParentID", "==", parentID),
-            where("State", "==", "On")
-        );
-
-        const snapshot = await getDocs(q);
-        const taskList = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                SubTaskID: data.SubTaskID,
-                ParentID: data.ParentID,
-                TopTaskID: data.TopTaskID,
-                SubTaskName: data.SubTaskName,
-                SubTaskDetail: data.SubTaskDetail,
-                CreatedTime: data.CreatedTime.toDate(),
-                EndTime: data.EndTime.toDate(),
-                State: data.State,
-            };
-        });
-        return taskList;
-    } catch (error) {
-        console.error("讀取任務失敗：", error);
-        return [];
-    }
-}; */
-
-//依據UserID獲取Group對應的Task
-/* export const fetchTaskGroup = async (userID) => {
-    try {
-        // 先查詢所有屬於該 user 的 group
-        const groupQuery = query(
-            collection(db, "Group"),
-            where("UserID", "==", userID),
-            where("State", "==", "On")
-        );
-        const groupSnapshot = await getDocs(groupQuery);
-
-        const groupIDs = groupSnapshot.docs.map(doc => doc.data().TaskID);
-
-        if (groupIDs.length === 0) {
-            return [];
-        }
-
-        // Task 查詢結果
-        const taskResults = [];
-
-        // Firestore 限制 where in 最多 10 個
-        const chunkSize = 10;
-        for (let i = 0; i < taskIDs.length; i += chunkSize) {
-            const chunk = groupIDs.slice(i, i + chunkSize);
-
-            const taskQuery = query(
-                collection(db, "Task"),
-                where("TaskID", "in", chunk)
-            );
-            const taskSnapshot = await getDocs(taskQuery);
-
-            const tasks = taskSnapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    TaskID: data.TaskID,
-                    UserID: data.UserID,
-                    TaskName: data.TaskName,
-                    TaskDetail: data.TaskDetail,
-                    CreatedTime: data.CreatedTime.toDate(),
-                    EndTime: data.EndTime.toDate(),
-                    State: data.State,
-                };
-            });
-
-            taskResults.push(...tasks);
-        }
-
-        return meetingResults;
-    } catch (error) {
-        console.error("讀取會議失敗：", error);
-        return [];
-    }
-}; */
-
-//依據TaskID獲取GroupMember
-/* export const fetchGroupMember = async (taskID) => {
-    try {
-        // 先查詢所有屬於該 task 的 user
-        const userQuery = query(
-            collection(db, "GroupRecord"),
-            where("TaskID", "==", taskID),
-            where("State", "==", "On")
-        );
-        const userSnapshot = await getDocs(userQuery);
-
-        const userIDs = userSnapshot.docs.map(doc => doc.data().UserID);
-
-        if (userIDs.length === 0) {
-            return []; // 沒有任務，就不查 meeting
-        }
-
-        // Meeting 查詢結果
-        const usernameResults = [];
-
-        // Firestore 限制 where in 最多 10 個
-        const chunkSize = 10;
-        for (let i = 0; i < userIDs.length; i += chunkSize) {
-            const chunk = userIDs.slice(i, i + chunkSize);
-
-            const usernameQuery = query(
-                collection(db, "User"),
-                where("UserID", "in", chunk)
-            );
-            const usernameSnapshot = await getDocs(usernameQuery);
-
-            const usernames = usernameSnapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    UserID: data.UserID,
-                    UserName: data.UserName,
-                };
-            });
-
-            usernameResults.push(...usernames);
-        }
-
-        return meetingResults;
-    } catch (error) {
-        console.error("讀取會議失敗：", error);
-        return [];
-    }
-}; */
-
-
 
 //依據UserID獲取meeting
 export const fetchUserMeeting = async (userID) => {

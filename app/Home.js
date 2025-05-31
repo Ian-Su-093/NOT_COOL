@@ -24,7 +24,7 @@ const Home = ({ navigation }) => {
             if (token) {
                 console.log("Sending token to backend...");
                 // send token to your backend
-                fetch(`${backend_url}/register-token`, {
+                fetch(`${backend_url}/tokens/push`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token }),
