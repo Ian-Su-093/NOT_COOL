@@ -73,7 +73,7 @@ const Tasks = ({ navigation }) => {
                                     }
                                     return 0;
                                 }).map((task, index) => (
-                                    <View key={index} style={styles.tasksTaskPreview}>
+                                    <Pressable key={index} style={styles.tasksTaskPreview} onPress={() => navigation.navigate("TaskDetails", { taskID: task.TaskID })}>
                                         <View>
                                             <Text style={styles.tasksTaskPreviewTitle}>{task.TaskName}</Text>
                                             <Text style={styles.tasksDate}>{task.EndTime ? new Date(task.EndTime).toLocaleString("zh-TW", {
@@ -86,7 +86,7 @@ const Tasks = ({ navigation }) => {
                                             }).replace(/\//g, "/") : "無"}</Text>
                                         </View>
                                         <Icon name="chevron-right" size={30} color="#aaa" style={{ alignSelf: "center", paddingLeft: 10 }} />
-                                    </View>
+                                    </Pressable>
                                 ))
                             ) : (
                                 <Text style={styles.tasksNoTasksText}>目前無{showCompleted ? "已完成" : "代辦"}事項</Text>

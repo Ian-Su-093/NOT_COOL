@@ -10,6 +10,7 @@ import Dashboard from './app/Dashboard'
 import Meetings from './app/Meetings'
 import MeetingDetails from './app/MeetingDetails'
 import Tasks from './app/Tasks'
+import TaskDetails from './app/TaskDetails'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -45,6 +46,7 @@ const MeetingsStack = () => (
 const TasksStack = () => (
     <Stack.Navigator initialRouteName="Tasks">
         <Stack.Screen name="Tasks" component={Tasks} options={{ headerShown: false }} />
+        <Stack.Screen name="TaskDetails" component={TaskDetails} options={{ headerShown: false }} />
     </Stack.Navigator>
 )
 
