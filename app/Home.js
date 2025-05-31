@@ -38,6 +38,8 @@ const Home = ({ navigation }) => {
     const [TaskName, setTaskName] = useState("");
     const [TaskDetail, setTaskDetail] = useState("");
     const [EndTime, setEndTime] = useState(new Date());
+    const [ExpectedTime, setExpectedTime] = useState("");
+    const [Penalty, setPenalty] = useState("");
 
     const [displayText, setDisplayText] = useState("");
     const [showPicker, setShowPicker] = useState(false); // 控制時間選擇器顯示
@@ -57,6 +59,8 @@ const Home = ({ navigation }) => {
                 TaskName,
                 TaskDetail,
                 EndTime,
+                ExpectedTime,
+                Penalty
             });
 
             setDisplayText(`已儲存：${UserName} - ${TaskName}`);
@@ -108,6 +112,18 @@ const Home = ({ navigation }) => {
                     }}
                 />
             )}
+            <TextInput
+                style={styles.input}
+                placeholder="所需時間"
+                value={ExpectedTime}
+                onChangeText={setExpectedTime}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="遲交懲罰"
+                value={Penalty}
+                onChangeText={setPenalty}
+            />
 
             <Button title="送出" onPress={handleSubmit} />
 
