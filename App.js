@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+import Login from './app/Login'
 import Home from './app/Home'
 import Dashboard from './app/Dashboard'
 import Meetings from './app/Meetings'
@@ -12,6 +13,15 @@ import Tasks from './app/Tasks'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
+
+const MainTabs = () => (
+    <Tab.Navigator initialRouteName="儀表板" screenOptions={{ headerShown: false }}>
+        <Tab.Screen name="首頁" component={HomeStack} />
+        <Tab.Screen name="儀表板" component={DashboardStack} />
+        <Tab.Screen name="會議" component={MeetingsStack} />
+        <Tab.Screen name="任務" component={TasksStack} />
+    </Tab.Navigator>
+)
 
 const HomeStack = () => (
     <Stack.Navigator initialRouteName="Home">
@@ -28,7 +38,6 @@ const DashboardStack = () => (
 const MeetingsStack = () => (
     <Stack.Navigator initialRouteName="Meetings">
         <Stack.Screen name="Meetings" component={Meetings} options={{ headerShown: false }} />
-        {/* <Stack.Screen name="MeetingDetails" component={MeetingDetails} options={{ headerTitle: "會議", headerStyle: { backgroundColor: "#F0EFF6" }, headerShadowVisible: false }} /> */}
         <Stack.Screen name="MeetingDetails" component={MeetingDetails} options={{ headerShown: false }} />
     </Stack.Navigator>
 )
@@ -42,12 +51,10 @@ const TasksStack = () => (
 const App = () => {
     return (
         <NavigationContainer>
-            <Tab.Navigator initialRouteName="儀表板" screenOptions={{ headerShown: false }}>
-                <Tab.Screen name="首頁" component={HomeStack} />
-                <Tab.Screen name="儀表板" component={DashboardStack} />
-                <Tab.Screen name="會議" component={MeetingsStack} />
-                <Tab.Screen name="任務" component={TasksStack} />
-            </Tab.Navigator>
+            <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="MainTabs" component={MainTabs} />
+            </Stack.Navigator>
         </NavigationContainer>
     )
 }
