@@ -6,14 +6,8 @@ export default StyleSheet.create({
         backgroundColor: "#F0EFF6",
     },
     content: {
-        padding: 20,
+        flexGrow: 1,
         paddingTop: 60,
-    },
-    header: {
-        fontSize: 30,
-        fontWeight: "bold",
-        marginBottom: 20,
-        color: "#333",
     },
     backButton: {
         alignSelf: "flex-start",
@@ -27,14 +21,14 @@ export default StyleSheet.create({
     },
     taskCard: {
         backgroundColor: "#FFFFFF",
-        borderRadius: 8,
         padding: 20,
+        flex: 1,
+    },
+    taskHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         marginBottom: 20,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
     },
     taskTitle: {
         fontSize: 24,
@@ -74,6 +68,10 @@ export default StyleSheet.create({
         fontSize: 12,
         fontWeight: "bold",
     },
+    dateSection: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
     membersList: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -91,11 +89,24 @@ export default StyleSheet.create({
         fontSize: 12,
         color: "#1976D2",
     },
-    taskId: {
-        fontSize: 10,
-        color: "#999",
-        fontFamily: "monospace",
-        marginTop: 10,
+    subtaskButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        alignItems: "left",
+        borderBottomWidth: 0.5,
+        borderBottomColor: "#D0D0D0",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    subtaskText: {
+        fontSize: 16,
+        fontWeight: "bold",
+        marginBottom: 15,
+    },
+    subtaskDate: {
+        fontSize: 14,
+        color: "#888",
     },
     editButton: {
         backgroundColor: "#007AFF",
@@ -106,6 +117,19 @@ export default StyleSheet.create({
         marginTop: 20,
     },
     editButtonText: {
+        color: "#FFFFFF",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    addButton: {
+        backgroundColor: "#34C759",
+        borderRadius: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        alignItems: "center",
+        marginTop: 20,
+    },
+    addButtonText: {
         color: "#FFFFFF",
         fontSize: 16,
         fontWeight: "bold",

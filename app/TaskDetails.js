@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, View, Text, Pressable } from "react-native";
-import { fetchUserTask } from "@/firebaseAPI";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./TaskDetails.styles";
+import { Platform } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const TaskDetail = ({ route, navigation }) => {
+const backend_url =
+    Platform.OS === 'web'
+        ? 'http://192.168.199.81:3000'       // For browser or Expo web
+        : 'http://192.168.199.81:3000';   // For physical phone
+
+const TaskDetails = ({ route, navigation }) => {
     const { taskID } = route.params;
     const [task, setTask] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [userID, setUserID] = useState(null);
+    const [childTaskNames, setChildTaskNames] = useState({});
+    const [childTaskEndTimes, setChildTaskEndTimes] = useState({});
 
     const fetchTaskData = async () => {
         try {
@@ -17,11 +25,10 @@ const TaskDetail = ({ route, navigation }) => {
             const userID = await AsyncStorage.getItem('userID');
             setUserID(userID);
 
-            const allTasks = await fetchUserTask(userID);
-            const targetTask = allTasks.find(task => task.TaskID === taskID);
+            const targetTask = await fetch(`${backend_url}/tasks/${taskID}`);
 
             if (targetTask) {
-                setTask(targetTask);
+                setTask((await targetTask.json()).task);
             } else {
                 setError("找不到該任務");
             }
@@ -36,6 +43,12 @@ const TaskDetail = ({ route, navigation }) => {
     useEffect(() => {
         fetchTaskData();
     }, [taskID]);
+
+    useEffect(() => {
+        if (task && task.Child && task.Child.length > 0) {
+            fetchChildNamesEndTimes(task.Child);
+        }
+    }, [task]);
 
     const formatDate = (date) => {
         if (!date) return "無";
@@ -60,6 +73,37 @@ const TaskDetail = ({ route, navigation }) => {
     const getStatusStyle = () => {
         const status = getTaskStatus();
         return status === "已完成" ? styles.statusCompleted : styles.statusInProgress;
+    };
+
+    const getImportanceColor = () => {
+        if (!task || task.Penalty === undefined) return "#000"; // Default color
+        const importance = Math.min(Math.max(task.Penalty, 1), 10);
+        // Assign importance from 1-10 to light green to bright yellow to bright red
+        const hue = (10 - importance) * 120 / 10; // 120 is the hue for green, 0 for red
+        return `hsl(${hue}, 100%, 50%)`; // HSL color format
+    }
+
+    const getPenaltyTextColor = () => {
+        if (!task || task.Penalty === undefined) return "#000";
+        if (task.Penalty <= 6) return "#000"; // Dark text for low importance
+        return "#FFF"; // Slightly darker for medium importance
+    }
+
+    const fetchChildNamesEndTimes = async (childIDs) => {
+        const names = {};
+        for (const childId of childIDs) {
+            try {
+                const response = await fetch(`${backend_url}/tasks/${childId}`);
+                const data = await response.json();
+                names[childId] = data.task.TaskName || "無名稱";
+                childTaskEndTimes[childId] = data.task.EndTime || "無截止時間";
+            } catch (error) {
+                console.error(`Failed to fetch child task ${childId}: `, error);
+                names[childId] = "無名稱";
+                childTaskEndTimes[childId] = "無截止時間";
+            }
+        }
+        setChildTaskNames(names);
     };
 
     if (loading) {
@@ -92,13 +136,12 @@ const TaskDetail = ({ route, navigation }) => {
                     <Text style={styles.backButtonText}>← 返回</Text>
                 </Pressable>
 
-                <Text style={styles.header}>任務詳情</Text>
-
                 <View style={styles.taskCard}>
-                    <Text style={styles.taskTitle}>{task.TaskName}</Text>
-
-                    <View style={[styles.statusBadge, getStatusStyle()]}>
-                        <Text style={styles.statusText}>{getTaskStatus()}</Text>
+                    <View style={styles.taskHeader}>
+                        <Text style={styles.taskTitle}>{task.TaskName}</Text>
+                        <View style={[styles.statusBadge, getStatusStyle()]}>
+                            <Text style={styles.statusText}>{getTaskStatus()}</Text>
+                        </View>
                     </View>
 
                     <View style={styles.section}>
@@ -108,30 +151,33 @@ const TaskDetail = ({ route, navigation }) => {
                         </Text>
                     </View>
 
+                    <View style={styles.dateSection}>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>建立時間</Text>
+                            <Text style={styles.sectionContent}>
+                                {formatDate(task.CreatedTime)}
+                            </Text>
+                        </View>
+
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>截止時間</Text>
+                            <Text style={styles.sectionContent}>
+                                {formatDate(task.EndTime)}
+                            </Text>
+                        </View>
+                    </View>
+
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>截止時間</Text>
+                        <Text style={styles.sectionTitle}>預計所需時間</Text>
                         <Text style={styles.sectionContent}>
-                            {formatDate(task.EndTime)}
+                            {task.ExpectedTime / 60 || 0} 分鐘
                         </Text>
                     </View>
 
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>建立時間</Text>
-                        <Text style={styles.sectionContent}>
-                            {formatDate(task.CreatedTime)}
-                        </Text>
-                    </View>
-
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>預計時間</Text>
-                        <Text style={styles.sectionContent}>
-                            {task.ExpectedTime || 0} 分鐘
-                        </Text>
-                    </View>
-
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>懲罰值</Text>
-                        <Text style={styles.sectionContent}>
+                        <Text style={styles.sectionTitle}>重要性</Text>
+                        <Text style={[styles.sectionContent,
+                        { backgroundColor: getImportanceColor(), borderRadius: 15, paddingVertical: 5, paddingHorizontal: 12, alignSelf: 'flex-start', color: getPenaltyTextColor() }]}>
                             {task.Penalty || 0}
                         </Text>
                     </View>
@@ -149,10 +195,36 @@ const TaskDetail = ({ route, navigation }) => {
                         </View>
                     )}
 
-                    <Text style={styles.taskId}>TaskID: {task.TaskID}</Text>
+                    {task.Child && task.Child.length > 0 && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>任務細項 ({task.Child.length})</Text>
+                            {task.Child.map((child, index) => (
+                                // Pressable buttons that directs to subtasks
+                                <Pressable
+                                    key={index}
+                                    style={styles.subtaskButton}
+                                    onPress={() => navigation.push('TaskDetails', { taskID: child })}
+                                >
+                                    <View>
+                                        <Text style={styles.subtaskText}>{childTaskNames[child]}</Text>
+                                        <Text style={styles.subtaskDate}>
+                                            {childTaskEndTimes[child] ? `截止: ${formatDate(childTaskEndTimes[child])}` : "無截止時間"}
+                                        </Text>
+                                    </View>
+                                    <Icon name="chevron-right" size={24} color="#aaa" style={{ alignSelf: "center", paddingLeft: 10 }} />
+                                </Pressable>
+                            ))}
+                        </View>
+                    )}
 
                     <Pressable style={styles.editButton}>
                         <Text style={styles.editButtonText}>編輯任務</Text>
+                    </Pressable>
+                    <Pressable style={styles.addButton}>
+                        <Text style={styles.addButtonText}>新增會議</Text>
+                    </Pressable>
+                    <Pressable style={styles.addButton}>
+                        <Text style={styles.addButtonText}>新增任務細項</Text>
                     </Pressable>
                 </View>
             </ScrollView>
@@ -160,4 +232,4 @@ const TaskDetail = ({ route, navigation }) => {
     );
 };
 
-export default TaskDetail;
+export default TaskDetails;

@@ -13,6 +13,8 @@ const backend_url =
 const Tasks = ({ navigation }) => {
     const [rootTasks, setRootTasks] = useState([])
     const [leafTasks, setLeafTasks] = useState([])
+    const [finishedRootTasks, setFinishedRootTasks] = useState([])
+    const [finishedLeafTasks, setFinishedLeafTasks] = useState([])
     const [sortedBy, setSortedBy] = useState("deadline")
     const [showCompleted, setShowCompleted] = useState(false)
     const [showRootTasks, setShowRootTasks] = useState(true)
@@ -30,9 +32,23 @@ const Tasks = ({ navigation }) => {
         setLeafTasks((await res.json()).tasks);
     }
 
+    const getFinishedRootTasks = async () => {
+        const userID = await AsyncStorage.getItem('userID');
+        const res = await fetch(`${backend_url}/users/${userID}/tasks/finished-root`);
+        setFinishedRootTasks((await res.json()).tasks);
+    }
+
+    const getFinishedLeafTasks = async () => {
+        const userID = await AsyncStorage.getItem('userID');
+        const res = await fetch(`${backend_url}/users/${userID}/tasks/finished-leaf`);
+        setFinishedLeafTasks((await res.json()).tasks);
+    }
+
     useEffect(() => {
         getRootTasks()
         getLeafTasks()
+        getFinishedRootTasks()
+        getFinishedLeafTasks()
         AsyncStorage.getItem('userID').then(value => {
             setUserID(value);
         });
@@ -55,20 +71,29 @@ const Tasks = ({ navigation }) => {
                 <View style={styles.tasksTaskList}>
                     {
                         (() => {
-                            const currentTasks = showRootTasks ? rootTasks : leafTasks;
-                            const filteredTasks = currentTasks.filter((task) => {
-                                if (!showCompleted) {
-                                    return task.UnfinishedMember.includes(userID);
-                                } else {
-                                    return !task.UnfinishedMember.includes(userID);
-                                }
-                            });
+                            currentTasks = [];
+                            if (showRootTasks && showCompleted) {
+                                currentTasks = finishedRootTasks;
+                            } else if (showRootTasks && !showCompleted) {
+                                currentTasks = rootTasks;
+                            } else if (!showRootTasks && showCompleted) {
+                                currentTasks = finishedLeafTasks;
+                            } else {
+                                currentTasks = leafTasks;
+                            }
+                            currentTasks = currentTasks || [];
 
-                            return filteredTasks.length > 0 ? (
-                                filteredTasks.sort((a, b) => {
+                            return currentTasks.length > 0 ? (
+                                currentTasks.sort((a, b) => {
                                     if (sortedBy === "deadline") {
+                                        if (a.EndTime === b.EndTime) {
+                                            return new Date(a.ExpectedTime) - new Date(b.ExpectedTime);
+                                        }
                                         return new Date(a.EndTime) - new Date(b.EndTime);
                                     } else if (sortedBy === "expectedTime") {
+                                        if (a.ExpectedTime === b.ExpectedTime) {
+                                            return new Date(a.EndTime) - new Date(b.EndTime);
+                                        }
                                         return a.ExpectedTime - b.ExpectedTime;
                                     }
                                     return 0;
