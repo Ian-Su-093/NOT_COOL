@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import { useFocusEffect } from "@react-navigation/native";
 import { ScrollView, View, Text, Pressable } from "react-native"
 import styles from "./Tasks.styles"
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -40,15 +41,31 @@ const Tasks = ({ navigation }) => {
         setFinishedLeafTasks((await res.json()).tasks);
     }
 
+    const fetchAllTasks = async () => {
+        try {
+            await Promise.all([
+                getRootTasks(),
+                getLeafTasks(),
+                getFinishedRootTasks(),
+                getFinishedLeafTasks()
+            ]);
+
+            const userID = await AsyncStorage.getItem('userID');
+            setUserID(userID);
+        } catch (error) {
+            console.error("Failed to fetch tasks: ", error);
+        }
+    }
+
     useEffect(() => {
-        getRootTasks()
-        getLeafTasks()
-        getFinishedRootTasks()
-        getFinishedLeafTasks()
-        AsyncStorage.getItem('userID').then(value => {
-            setUserID(value);
-        });
+        fetchAllTasks();
     }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchAllTasks();
+        }, [])
+    );
 
     return (
         <View style={{ flex: 1, backgroundColor: "#F0EFF6" }}>

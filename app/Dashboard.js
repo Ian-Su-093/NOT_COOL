@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import { useFocusEffect } from "@react-navigation/native";
 import { ScrollView, View, Text } from "react-native"
 import { fetchUserMeeting, fetchUserTask } from "@/firebaseAPI";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,6 +31,12 @@ const Dashboard = ({ navigation }) => {
     useEffect(() => {
         fetchData()
     }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchData();
+        }, [])
+    );
 
     return (
         <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>

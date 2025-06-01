@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import styles from './AddTask.styles';
+import styles from './EditTask.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const backend_url = 'http://192.168.199.81:3000';
 
-const AddTask = ({ route, navigation }) => {
-    const { parentTaskID } = route.params || {};
+const EditTask = ({ route, navigation }) => {
+    const { taskID } = route.params || {};
+    const [parentTaskID, setParentTaskID] = useState(null);
     const [taskName, setTaskName] = useState('');
     const [taskDetail, setTaskDetail] = useState('');
     const [endTime, setEndTime] = useState(new Date());
     const [expectedTime, setExpectedTime] = useState('');
     const [penalty, setPenalty] = useState('');
     const [showPicker, setShowPicker] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [parentPenalty, setParentPenalty] = useState(-1);
     const [newMember, setNewMember] = useState('');
     const [memberList, setMemberList] = useState([]);
@@ -90,7 +91,10 @@ const AddTask = ({ route, navigation }) => {
                 setNewMember('');
 
                 alert('成功', '任務已新增！', [
-                    { text: '確定', }
+                    {
+                        text: '確定',
+                        onPress: () => navigation.goBack(),
+                    }
                 ]);
             } else {
                 const errorData = await response.json();
@@ -98,7 +102,6 @@ const AddTask = ({ route, navigation }) => {
                 console.error('新增任務失敗:', errorData);
                 setIsLoading(false);
             }
-            navigation.goBack();
         } catch (error) {
             console.error('新增任務時發生錯誤:', error);
             alert('錯誤', '新增任務時發生錯誤，請稍後再試。');
@@ -106,8 +109,41 @@ const AddTask = ({ route, navigation }) => {
         }
     };
 
+    const handleDelete = async () => {
+        if (!taskID) {
+            alert('錯誤', '未找到任務ID，無法刪除。');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            console.log('正在刪除任務:', taskID);
+            const res = await fetch(`${backend_url}/tasks/${taskID}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ TaskID: taskID }),
+            });
+            if (res.ok) {
+                alert('成功', '任務已刪除！', [
+                    { text: '確定', }
+                ]);
+            } else {
+                const errorData = await res.json();
+                alert('錯誤', `刪除任務失敗: ${errorData.message}`);
+                console.error('刪除任務失敗:', errorData);
+            }
+            navigation.goBack();
+        } catch (error) {
+            console.error('刪除任務時發生錯誤:', error);
+            alert('錯誤', '刪除任務時發生錯誤，請稍後再試。');
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     const getParentPenalty = async () => {
-        if (!parentTaskID) return;
+        if (!parentTaskID || parentTaskID === "NULL") return;
 
         try {
             const response = await fetch(`${backend_url}/tasks/${parentTaskID}`);
@@ -143,6 +179,36 @@ const AddTask = ({ route, navigation }) => {
             alert('錯誤', '無法找到該成員，請確認用戶名是否正確。');
         }
     }
+
+    const getDefaultTaskData = async () => {
+        if (!taskID) return;
+        try {
+            const response = await fetch(`${backend_url}/tasks/${taskID}`);
+            if (response.ok) {
+                const taskData = (await response.json()).task;
+                setTaskName(taskData.TaskName);
+                setTaskDetail(taskData.TaskDetail);
+                setEndTime(new Date(taskData.EndTime));
+                setExpectedTime((taskData.ExpectedTime / 60).toString());
+                setPenalty(taskData.Penalty.toString());
+                setParentTaskID(taskData.Parent);
+                // if (taskData.Members) {
+                //     setMemberList(taskData.Members.map(member => member.Username));
+                // }
+            } else {
+                console.error('獲取任務失敗:', response.statusText);
+            }
+        } catch (error) {
+            console.error('獲取任務時發生錯誤:', error);
+            alert('錯誤', '獲取任務時發生錯誤，請稍後再試。');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getDefaultTaskData();
+    }, [taskID]);
 
     useEffect(() => {
         getParentPenalty();
@@ -220,10 +286,13 @@ const AddTask = ({ route, navigation }) => {
                 </Pressable>
             </View>
             <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleSubmit} disabled={isLoading}>
-                <View><Text style={styles.buttonText}>新增</Text></View>
+                <View><Text style={styles.buttonText}>更新</Text></View>
+            </Pressable>
+            <Pressable style={[styles.button, isLoading && styles.buttonDisabled, styles.deleteButton]} onPress={handleDelete} disabled={isLoading}>
+                <View><Text style={styles.buttonText}>刪除</Text></View>
             </Pressable>
         </ScrollView>
     );
 }
 
-export default AddTask;
+export default EditTask;

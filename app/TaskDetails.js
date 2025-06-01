@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { ScrollView, View, Text, Pressable } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./TaskDetails.styles";
@@ -39,6 +40,12 @@ const TaskDetails = ({ route, navigation }) => {
     useEffect(() => {
         fetchTaskData();
     }, [taskID]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchTaskData();
+        }, [taskID])
+    );
 
     useEffect(() => {
         if (task && task.Child && task.Child.length > 0) {
@@ -215,7 +222,7 @@ const TaskDetails = ({ route, navigation }) => {
                         </View>
                     )}
 
-                    <Pressable style={styles.editButton}>
+                    <Pressable style={styles.editButton} onPress={() => navigation.navigate('EditTask', { taskID: task.TaskID })}>
                         <Text style={styles.editButtonText}>編輯任務</Text>
                     </Pressable>
                     <Pressable style={styles.addButton} onPress={() => navigation.navigate('Settings')}>
