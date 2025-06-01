@@ -94,19 +94,21 @@ const TaskDetails = ({ route, navigation }) => {
 
     const fetchChildNamesEndTimes = async (childIDs) => {
         const names = {};
+        const endTimes = {};
         for (const childId of childIDs) {
             try {
                 const response = await fetch(`${backend_url}/tasks/${childId}`);
                 const data = await response.json();
                 names[childId] = data.task.TaskName || "無名稱";
-                childTaskEndTimes[childId] = data.task.EndTime || "無截止時間";
+                endTimes[childId] = data.task.EndTime || "無截止時間";
             } catch (error) {
                 console.error(`Failed to fetch child task ${childId}: `, error);
                 names[childId] = "無名稱";
-                childTaskEndTimes[childId] = "無截止時間";
+                endTimes[childId] = "無截止時間";
             }
         }
         setChildTaskNames(names);
+        setChildTaskEndTimes(endTimes);
     };
 
     const setStatus = async (status) => {
@@ -248,9 +250,7 @@ const TaskDetails = ({ route, navigation }) => {
                     {task.Child && task.Child.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>任務細項 ({task.Child.length})</Text>
-                            {task.Child.filter(
-                                child => isAvailable(child)
-                            ).map((child, index) => (
+                            {task.Child.map((child, index) => (
                                 // Pressable buttons that directs to subtasks
                                 <Pressable
                                     key={index}
@@ -264,7 +264,7 @@ const TaskDetails = ({ route, navigation }) => {
                                         </Text>
                                     </View>
                                     <Icon name="chevron-right" size={24} color="#aaa" style={{ alignSelf: "center", paddingLeft: 10 }} />
-                                </Pressable>
+                                </Pressable> 
                             ))}
                         </View>
                     )}
