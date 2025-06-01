@@ -30,7 +30,33 @@ export default StyleSheet.create({
         marginBottom: 10,
     },
     topTask: {
-
+        backgroundColor: '#8B0000',
+        borderRadius: 8,
+        padding: 15,
+        marginBottom: 20,
+    },
+    topTaskTitle: {
+        color: '#FFFFFF',
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    topTaskDetail: {
+        backgroundColor: '#FFFFFF',
+        color: '#000000',
+        borderRadius: 8,
+        minHeight: 160,
+        fontSize: 16,
+        marginBottom: 10,
+    },
+    memberBadge: {
+        color: '#000',
+        fontSize: 14,
+        backgroundColor: '#fff',
+        padding: 5,
+        paddingHorizontal: 10,
+        borderRadius: 20,
+        alignSelf: 'flex-start',
     },
     ongoingTask: {
         borderRadius: 8,
