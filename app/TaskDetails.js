@@ -15,6 +15,7 @@ const TaskDetails = ({ route, navigation }) => {
     const [userID, setUserID] = useState(null);
     const [childTaskNames, setChildTaskNames] = useState({});
     const [childTaskEndTimes, setChildTaskEndTimes] = useState({});
+    const [availableChildren, setAvailableChildren] = useState([]);
 
     const fetchTaskData = async () => {
         try {
@@ -95,12 +96,18 @@ const TaskDetails = ({ route, navigation }) => {
     const fetchChildNamesEndTimes = async (childIDs) => {
         const names = {};
         const endTimes = {};
+        const available = [];
+
         for (const childId of childIDs) {
             try {
                 const response = await fetch(`${backend_url}/tasks/${childId}`);
                 const data = await response.json();
                 names[childId] = data.task.TaskName || "無名稱";
                 endTimes[childId] = data.task.EndTime || "無截止時間";
+
+                if (data.task && data.task.State === "On") {
+                    available.push(childId);
+                }
             } catch (error) {
                 console.error(`Failed to fetch child task ${childId}: `, error);
                 names[childId] = "無名稱";
@@ -109,6 +116,7 @@ const TaskDetails = ({ route, navigation }) => {
         }
         setChildTaskNames(names);
         setChildTaskEndTimes(endTimes);
+        setAvailableChildren(available);
     };
 
     const setStatus = async (status) => {
@@ -146,14 +154,6 @@ const TaskDetails = ({ route, navigation }) => {
                 setError("更新任務狀態失敗");
             }
         }
-    }
-
-    const isAvailable = async (taskID) => {
-        const res = await fetch(`${backend_url}/tasks/${taskID}`);
-        const data = (await res.json()).task;
-        console.log("Task state:", data.State);
-        console.log(data && data.State === "On");
-        return (data && data.State === "On");
     }
 
     if (loading) {
@@ -249,8 +249,8 @@ const TaskDetails = ({ route, navigation }) => {
 
                     {task.Child && task.Child.length > 0 && (
                         <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>任務細項 ({task.Child.length})</Text>
-                            {task.Child.map((child, index) => (
+                            <Text style={styles.sectionTitle}>任務細項 ({availableChildren.length})</Text>
+                            {availableChildren.map((child, index) => (
                                 // Pressable buttons that directs to subtasks
                                 <Pressable
                                     key={index}
