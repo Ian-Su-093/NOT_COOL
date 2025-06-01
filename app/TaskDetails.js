@@ -223,7 +223,7 @@ const TaskDetails = ({ route, navigation }) => {
                     <Pressable style={styles.addButton}>
                         <Text style={styles.addButtonText}>新增會議</Text>
                     </Pressable>
-                    <Pressable style={styles.addButton}>
+                    <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddTask', { parentTaskID: task.TaskID })}>
                         <Text style={styles.addButtonText}>新增任務細項</Text>
                     </Pressable>
                 </View>

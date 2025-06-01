@@ -118,6 +118,13 @@ const Tasks = ({ navigation }) => {
                             );
                         })()
                     }
+                    {
+                        !showCompleted && (
+                            <Pressable style={styles.tasksAddTaskButton} onPress={() => navigation.navigate("AddTask")}>
+                                <Text style={styles.tasksAddTaskButtonText}>新增任務</Text>
+                            </Pressable>
+                        )
+                    }
                 </View>
             </ScrollView>
         </View>

@@ -11,6 +11,7 @@ import Meetings from './app/Meetings'
 import MeetingDetails from './app/MeetingDetails'
 import Tasks from './app/Tasks'
 import TaskDetails from './app/TaskDetails'
+import AddTask from './app/AddTask'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -56,6 +57,7 @@ const App = () => {
             <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="MainTabs" component={MainTabs} />
+                <Stack.Screen name="AddTask" component={AddTask} options={{ headerShown: true, title: '新增任務' }} />
             </Stack.Navigator>
         </NavigationContainer>
     )

@@ -51,5 +51,18 @@ export default StyleSheet.create({
     tasksDate: {
         fontSize: 12,
         color: "#888",
-    }
+    },
+    tasksAddTaskButton: {
+        backgroundColor: "#34C759",
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: "center",
+        marginTop: 20,
+    },
+    tasksAddTaskButtonText: {
+        color: "#FFFFFF",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
 })
