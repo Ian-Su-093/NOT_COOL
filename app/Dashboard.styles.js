@@ -1,69 +1,102 @@
+import { on } from "events";
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-    dashboard: {
+    container: {
+        flex: 1,
         backgroundColor: "#FFFFFF",
-        padding: 20,
-        paddingTop: 80,
     },
-    dashboardHeader: {
-        fontSize: 30,
-        fontWeight: "bold",
+    content: {
+        flexGrow: 1,
+        paddingTop: 60,
+    },
+    headBar: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    taskContent: {
+        padding: 20,
+    },
+    title: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333333',
+        marginBottom: 10,
+    },
+    topTask: {
+
+    },
+    ongoingTask: {
+        borderRadius: 8,
+        padding: 20,
+        marginBottom: 20,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    taskInfo: {
+        color: '#FFFFFF',
+    },
+    finishedTask: {
         marginBottom: 20,
     },
-    dashboardBlock: {
-        backgroundColor: "#F0EFF6",
-        borderRadius: 10,
-        padding: 20,
-        marginBottom: 30,
-        elevation: 3,
+
+
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-end',
     },
-    dashboardBlockHeader: {
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 10,
+    modalContent: {
+        backgroundColor: '#FFFFFF',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        height: '50%', // 半頁面高度
+        paddingTop: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: -2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
     },
-    dashboardTaskPreview: {
-        backgroundColor: "#FFFFFF",
-        borderWidth: 2,
-        borderColor: "#E0E0E0",
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 10,
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingBottom: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
     },
-    dashboardTaskPreviewTitle: {
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333333',
+    },
+    modalBody: {
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+    },
+    filterOption: {
         fontSize: 16,
-        fontWeight: "bold",
-        marginBottom: 5,
-    },
-    dashboardTaskPreviewProgress: {
-        fontSize: 14,
-    },
-    dashboardNoTasksText: {
-        fontSize: 16,
-        color: "#888",
-    },
-    dashboardDate: {
-        fontSize: 12,
-        color: "#888",
-    },
-    dashboardMeetingPreview: {
-        backgroundColor: "#FFFFFF",
-        borderWidth: 2,
-        borderColor: "#E0E0E0",
-        borderRadius: 8,
-        padding: 10,
+        fontWeight: 'bold',
+        color: '#333333',
         marginBottom: 10,
-        display: "flex",
-        flexDirection: "row",
+        marginTop: 15,
     },
-    dashboardMeetingDuration: {
-        fontSize: 12,
-        marginLeft: "auto",
-        alignSelf: "center",
-        backgroundColor: "#B5E2FF",
-        borderRadius: 8,
-        paddingVertical: 1,
-        paddingHorizontal: 10,
+    filterItem: {
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
     },
-});
+})

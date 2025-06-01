@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Login from './app/Login'
 import Home from './app/Home'
 import Dashboard from './app/Dashboard'
+import OldDashboard from './app/OldDashboard'
 import Meetings from './app/Meetings'
 import MeetingDetails from './app/MeetingDetails'
 import Tasks from './app/Tasks'
@@ -21,6 +22,7 @@ const Stack = createNativeStackNavigator()
 const MainTabs = () => (
     <Tab.Navigator initialRouteName="儀表板" screenOptions={{ headerShown: false }}>
         <Tab.Screen name="儀表板" component={DashboardStack} />
+        <Tab.Screen name="舊儀表板" component={OldDashboardStack} />
         <Tab.Screen name="任務" component={TasksStack} />
         <Tab.Screen name="會議" component={MeetingsStack} />
     </Tab.Navigator>
@@ -35,6 +37,12 @@ const HomeStack = () => (
 const DashboardStack = () => (
     <Stack.Navigator initialRouteName="Dashboard">
         <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+    </Stack.Navigator>
+)
+
+const OldDashboardStack = () => (
+    <Stack.Navigator initialRouteName="OldDashboard">
+        <Stack.Screen name="OldDashboard" component={OldDashboard} options={{ headerShown: false }} />
     </Stack.Navigator>
 )
 
