@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./TaskDetails.styles";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const backend_url = 'http://192.168.199.81:3000'   // For physical phone
+const backend_url = 'http://172.20.10.2:3000'   // For physical phone
 
 const TaskDetails = ({ route, navigation }) => {
     const { taskID } = route.params;
@@ -264,7 +264,7 @@ const TaskDetails = ({ route, navigation }) => {
                                         </Text>
                                     </View>
                                     <Icon name="chevron-right" size={24} color="#aaa" style={{ alignSelf: "center", paddingLeft: 10 }} />
-                                </Pressable>
+                                </Pressable> 
                             ))}
                         </View>
                     )}
@@ -272,7 +272,7 @@ const TaskDetails = ({ route, navigation }) => {
                     <Pressable style={styles.editButton} onPress={() => navigation.navigate('EditTask', { taskID: task.TaskID })}>
                         <Text style={styles.editButtonText}>編輯任務</Text>
                     </Pressable>
-                    <Pressable style={styles.addButton}>
+                    <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddMeeting', { taskID: task.TaskID })}>
                         <Text style={styles.addButtonText}>新增會議</Text>
                     </Pressable>
                     <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddTask', { parentTaskID: task.TaskID })}>

@@ -1,27 +1,51 @@
 import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text, Pressable } from "react-native"
-import { fetchUserMeeting } from "@/firebaseAPI";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from "@react-navigation/native";
 
 import styles from "./Meetings.styles"
+
+const backend_url = 'http://172.20.10.2:3000'   // For physical phone
 
 const Meetings = ({ navigation }) => {
     const [Meetings, setMeetings] = useState([])
 
-    const fetchData = async () => {
+    const fetchMeetings = async () => {
         try {
             const userID = await AsyncStorage.getItem('userID');
-            const MeetingData = await fetchUserMeeting(userID);
-            setMeetings(MeetingData);
+            if (!userID) {
+                alert("錯誤", "未找到用戶ID，請先登入。");
+                return;
+            }
+
+            console.log("Fetching meetings for userID: ", userID);
+            const res = await fetch(`${backend_url}/users/${userID}/meetings`);
+            if (res.ok) {
+                const data = await res.json();
+                setMeetings(data.meetings || []);
+            } else {
+                const errorData = await res.json();
+                console.error("Error fetching meetings: ", errorData);
+                alert("錯誤", "無法獲取會議資料，請稍後再試。");
+                return;
+            }
         } catch (error) {
-            console.error("Failed to fetch data: ", error);
+            console.error("Failed to fetch meetings: ", error);
+            alert("錯誤", "無法獲取會議資料，請稍後再試。");
+            return;
         }
     }
 
     useEffect(() => {
-        fetchData()
-    }, [])
+        fetchMeetings();
+    }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchMeetings();
+        }, [])
+    );
 
     return (
         <View style={{ flex: 1, backgroundColor: "#F0EFF6" }}>
