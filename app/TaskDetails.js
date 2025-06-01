@@ -2,13 +2,9 @@ import React, { useState, useEffect } from "react";
 import { ScrollView, View, Text, Pressable } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./TaskDetails.styles";
-import { Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const backend_url =
-    Platform.OS === 'web'
-        ? 'http://192.168.199.81:3000'       // For browser or Expo web
-        : 'http://192.168.199.81:3000';   // For physical phone
+const backend_url = 'http://192.168.199.81:3000'   // For physical phone
 
 const TaskDetails = ({ route, navigation }) => {
     const { taskID } = route.params;
@@ -139,9 +135,11 @@ const TaskDetails = ({ route, navigation }) => {
                 <View style={styles.taskCard}>
                     <View style={styles.taskHeader}>
                         <Text style={styles.taskTitle}>{task.TaskName}</Text>
-                        <View style={[styles.statusBadge, getStatusStyle()]}>
-                            <Text style={styles.statusText}>{getTaskStatus()}</Text>
-                        </View>
+                        <Pressable>
+                            <View style={[styles.statusBadge, getStatusStyle()]}>
+                                <Text style={styles.statusText}>{getTaskStatus()}</Text>
+                            </View>
+                        </Pressable>
                     </View>
 
                     <View style={styles.section}>
@@ -220,7 +218,7 @@ const TaskDetails = ({ route, navigation }) => {
                     <Pressable style={styles.editButton}>
                         <Text style={styles.editButtonText}>編輯任務</Text>
                     </Pressable>
-                    <Pressable style={styles.addButton}>
+                    <Pressable style={styles.addButton} onPress={() => navigation.navigate('Settings')}>
                         <Text style={styles.addButtonText}>新增會議</Text>
                     </Pressable>
                     <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddTask', { parentTaskID: task.TaskID })}>

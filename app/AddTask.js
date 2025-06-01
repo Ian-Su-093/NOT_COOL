@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, ScrollView, Pressable } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import styles from './AddTask.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 
-const backend_url =
-    Platform.OS === 'web'
-        ? 'http://192.168.199.81:3000'
-        : 'http://192.168.199.81:3000';
+const backend_url = 'http://192.168.199.81:3000';
 
 const AddTask = ({ route, navigation }) => {
     const { parentTaskID } = route.params || {};
@@ -20,6 +16,8 @@ const AddTask = ({ route, navigation }) => {
     const [showPicker, setShowPicker] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [parentPenalty, setParentPenalty] = useState(-1);
+    const [newMember, setNewMember] = useState('');
+    const [memberList, setMemberList] = useState([]);
 
     const handleSubmit = async () => {
         if (!taskName || !taskDetail || !endTime || !expectedTime || !penalty || penalty < 1 || penalty > 10) {
@@ -47,7 +45,6 @@ const AddTask = ({ route, navigation }) => {
                 EndTime: endTime.toISOString(),
                 ExpectedTime: parseInt(expectedTime) * 60,
                 Penalty: parseInt(penalty),
-                Member: [userID],
                 Parent: parentTaskID || null,
             };
 
@@ -62,7 +59,25 @@ const AddTask = ({ route, navigation }) => {
             });
 
             if (response.ok) {
-                const data = await response.json();
+                const newTask = await response.json();
+                const taskID = newTask.TaskID;
+                for (const member of memberList) {
+                    const memberData = await fetch(`${backend_url}/users/by-username/${member}`);
+                    const memberID = (await memberData.json()).UserID;
+                    const memberResponse = await fetch(`${backend_url}/tasks/${taskID}/members`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ UserID: memberID }),
+                    });
+                    if (!memberResponse.ok) {
+                        const errorData = await memberResponse.json();
+                        console.error(`添加成員 ${member} 失敗:`, errorData);
+                    } else {
+                        console.log(`成員 ${member} 已成功添加到任務 ${taskID}`);
+                    }
+                }
 
                 setTaskName('');
                 setTaskDetail('');
@@ -71,6 +86,8 @@ const AddTask = ({ route, navigation }) => {
                 setPenalty('');
                 setShowPicker(false);
                 setIsLoading(false);
+                setMemberList([]);
+                setNewMember('');
 
                 alert('成功', '任務已新增！', [
                     {
@@ -109,12 +126,34 @@ const AddTask = ({ route, navigation }) => {
         }
     }
 
+    const appendMember = async () => {
+        if (!newMember) {
+            alert('請輸入成員名稱！');
+            return;
+        }
+        if (memberList.includes(newMember)) {
+            alert('成員已存在！');
+            return;
+        }
+        const res = await fetch(`${backend_url}/users/by-username/${newMember}`);
+        if (res.ok) {
+            const user = await res.json();
+            if (user) {
+                setMemberList([...memberList, newMember]);
+            } else {
+                alert('錯誤', `未找到用戶 ${newMember}。`);
+            }
+        } else {
+            alert('錯誤', '無法找到該成員，請確認用戶名是否正確。');
+        }
+    }
+
     useEffect(() => {
         getParentPenalty();
     }, [parentTaskID]);
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.infoBox}>
                 <TextInput
                     style={styles.input}
@@ -153,17 +192,41 @@ const AddTask = ({ route, navigation }) => {
                     onChangeText={setExpectedTime}
                 />
                 <TextInput
-                    style={styles.lastInput}
+                    style={styles.input}
                     placeholder="重要性 (1-10)"
                     value={penalty}
                     keyboardType="numeric"
                     onChangeText={setPenalty}
                 />
+                {
+                    memberList.length > 0 && (
+                        <View style={styles.memberList}>
+                            {memberList.map((member, index) => (
+                                <Pressable key={index} onPress={() => {
+                                    setMemberList(memberList.filter(m => m !== member));
+                                }}>
+                                    <View>
+                                        <Text style={styles.memberItem}>{member}</Text>
+                                    </View>
+                                </Pressable>
+                            ))}
+                        </View>
+                    )
+                }
+                <TextInput
+                    style={styles.lastInput}
+                    placeholder="新增成員"
+                    value={newMember}
+                    onChangeText={setNewMember}
+                />
+                <Pressable style={styles.button} onPress={() => appendMember()}>
+                    <View><Text style={styles.buttonText}>新增成員</Text></View>
+                </Pressable>
             </View>
             <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleSubmit} disabled={isLoading}>
                 <View><Text style={styles.buttonText}>新增</Text></View>
             </Pressable>
-        </View>
+        </ScrollView>
     );
 }
 

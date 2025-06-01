@@ -47,6 +47,18 @@ export default StyleSheet.create({
         color: '#FFF',
         fontSize: 16,
     },
+    memberList: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginBottom: 20,
+    },
+    memberItem: {
+        backgroundColor: '#B5E2FF',
+        padding: 10,
+        borderRadius: 20,
+        marginRight: 10,
+        marginBottom: 10,
+    },
     lastInput: {
         height: 60,
         // borderColor: '#ccc',

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button } from "react-native";
 import { addTask, fetchUserTask, fetchUserIDByUserName } from "@/firebaseAPI";
-import { Platform } from 'react-native';
 
 // Notification
 import { registerForPushNotificationsAsync } from './notifications';
@@ -10,10 +9,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 import styles from "./Home.styles"; // 引入樣式
 
-const backend_url =
-    Platform.OS === 'web'
-        ? 'http://localhost:3000'       // For browser or Expo web
-        : 'http://192.168.1.15:3000';   // For physical phone
+const backend_url = 'http://192.168.1.15:3000';   // For physical phone
 
 const Home = ({ navigation }) => {
 

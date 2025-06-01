@@ -2,25 +2,32 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './Login.styles';
-import { Platform } from 'react-native';
 
-const backend_url =
-    Platform.OS === 'web'
-        ? 'http://192.168.199.81:3000'       // For browser or Expo web
-        : 'http://192.168.199.81:3000';   // For physical phone
+
+const backend_url = 'http://192.168.199.81:3000'   // For physical phone
 
 export default function Login({ navigation }) {
     const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
         try {
-            const res = await fetch(`${backend_url}/users/by-username/${username}`);
+            const uid = await fetch(`${backend_url}/users/by-username/${username}`);
+            const userID = (await uid.json()).UserID;
+            const res = await fetch(`${backend_url}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ UserID: userID, Password: password }),
+            });
             const data = await res.json();
             console.log(data.success);
+            console.log(data.message);
 
             if (data.success) {
                 // 導航到主要的 Tab Navigator
-                await AsyncStorage.setItem('userID', data.UserID);
+                await AsyncStorage.setItem('userID', userID);
                 await AsyncStorage.setItem('username', username);
                 navigation.navigate('MainTabs');
             } else {
@@ -42,7 +49,15 @@ export default function Login({ navigation }) {
                 onChangeText={setUsername}
                 autoCapitalize="none"
             />
-            <Button title="Login" onPress={handleLogin} />
+            <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry
+                autoCapitalize="none"
+                value={password}
+                onChangeText={setPassword}
+            />
+            <Button title="登入" onPress={handleLogin} />
         </View>
     );
 }

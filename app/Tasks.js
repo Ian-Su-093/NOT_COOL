@@ -2,13 +2,9 @@ import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text, Pressable } from "react-native"
 import styles from "./Tasks.styles"
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const backend_url =
-    Platform.OS === 'web'
-        ? 'http://192.168.199.81:3000'       // For browser or Expo web
-        : 'http://192.168.199.81:3000';   // For physical phone
+const backend_url = 'http://192.168.199.81:3000'   // For physical phone
 
 const Tasks = ({ navigation }) => {
     const [rootTasks, setRootTasks] = useState([])
@@ -119,7 +115,7 @@ const Tasks = ({ navigation }) => {
                         })()
                     }
                     {
-                        !showCompleted && (
+                        !showCompleted && showRootTasks && (
                             <Pressable style={styles.tasksAddTaskButton} onPress={() => navigation.navigate("AddTask")}>
                                 <Text style={styles.tasksAddTaskButtonText}>新增任務</Text>
                             </Pressable>
