@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { ScrollView, View, Text, Pressable } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -109,6 +109,51 @@ const TaskDetails = ({ route, navigation }) => {
         setChildTaskNames(names);
     };
 
+    const setStatus = async (status) => {
+        if (!userID || !task) return;
+        if (status === "進行中") {
+            try {
+                const response = await fetch(`${backend_url}/tasks/${taskID}/unfinish`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ UserID: userID, TaskID: taskID }),
+                });
+                if (!response.ok) throw new Error("Failed to start task");
+                setTask(prev => ({ ...prev, UnfinishedMember: [...(prev.UnfinishedMember || []), userID] }));
+                getStatusStyle();
+            } catch (error) {
+                console.error("Failed to update task status: ", error);
+                setError("更新任務狀態失敗");
+            }
+        } else if (status === "已完成") {
+            try {
+                const response = await fetch(`${backend_url}/tasks/${taskID}/finish`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ UserID: userID, TaskID: taskID }),
+                });
+                if (!response.ok) throw new Error("Failed to finish task");
+                setTask(prev => ({ ...prev, UnfinishedMember: (prev.UnfinishedMember || []).filter(id => id !== userID) }));
+                getStatusStyle();
+            } catch (error) {
+                console.error("Failed to update task status: ", error);
+                setError("更新任務狀態失敗");
+            }
+        }
+    }
+
+    const isAvailable = async (taskID) => {
+        const res = await fetch(`${backend_url}/tasks/${taskID}`);
+        const data = (await res.json()).task;
+        console.log("Task state:", data.State);
+        console.log(data && data.State === "On");
+        return (data && data.State === "On");
+    }
+
     if (loading) {
         return (
             <View style={styles.container}>
@@ -142,7 +187,7 @@ const TaskDetails = ({ route, navigation }) => {
                 <View style={styles.taskCard}>
                     <View style={styles.taskHeader}>
                         <Text style={styles.taskTitle}>{task.TaskName}</Text>
-                        <Pressable>
+                        <Pressable onPress={() => setStatus(getTaskStatus() === "進行中" ? "已完成" : "進行中")}>
                             <View style={[styles.statusBadge, getStatusStyle()]}>
                                 <Text style={styles.statusText}>{getTaskStatus()}</Text>
                             </View>
@@ -203,7 +248,9 @@ const TaskDetails = ({ route, navigation }) => {
                     {task.Child && task.Child.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>任務細項 ({task.Child.length})</Text>
-                            {task.Child.map((child, index) => (
+                            {task.Child.filter(
+                                child => isAvailable(child)
+                            ).map((child, index) => (
                                 // Pressable buttons that directs to subtasks
                                 <Pressable
                                     key={index}
@@ -225,7 +272,7 @@ const TaskDetails = ({ route, navigation }) => {
                     <Pressable style={styles.editButton} onPress={() => navigation.navigate('EditTask', { taskID: task.TaskID })}>
                         <Text style={styles.editButtonText}>編輯任務</Text>
                     </Pressable>
-                    <Pressable style={styles.addButton} onPress={() => navigation.navigate('Settings')}>
+                    <Pressable style={styles.addButton}>
                         <Text style={styles.addButtonText}>新增會議</Text>
                     </Pressable>
                     <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddTask', { parentTaskID: task.TaskID })}>

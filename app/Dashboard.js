@@ -1,133 +1,149 @@
-import React, { useState, useEffect } from "react"
-import { useFocusEffect } from "@react-navigation/native";
-import { ScrollView, View, Text } from "react-native"
-import { fetchUserMeeting, fetchUserTask } from "@/firebaseAPI";
+import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, ScrollView, Pressable, Modal } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import styles from "./Dashboard.styles"
+import styles from './Dashboard.styles';
+
+const backend_url = 'http://192.168.199.81:3000'
 
 const Dashboard = ({ navigation }) => {
-    const [Tasks, setTasks] = useState([])
-    const [Meetings, setMeetings] = useState([])
+    const [leafTasks, setLeafTasks] = useState([]);
+    const [finishedLeafTasks, setFinishedLeafTasks] = useState([]);
+    const [showModal, setShowModal] = useState(false);
 
-    // 從 Firestore 讀取資料
-    const fetchData = async () => {
+    const getLeafTasks = async () => {
+        const userID = await AsyncStorage.getItem('userID');
+        const res = await fetch(`${backend_url}/users/${userID}/tasks/leaf`);
+        setLeafTasks((await res.json()).tasks);
+    }
+
+    const getFinishedLeafTasks = async () => {
+        const userID = await AsyncStorage.getItem('userID');
+        const res = await fetch(`${backend_url}/users/${userID}/tasks/finished-leaf`);
+        setFinishedLeafTasks((await res.json()).tasks);
+    }
+
+    const fetchAllTasks = async () => {
         try {
-            const userID = await AsyncStorage.getItem('userID');
-
-            const [TasksData, MeetingData] = await Promise.all([
-                fetchUserTask(userID),
-                fetchUserMeeting(userID)
+            await Promise.all([
+                getLeafTasks(),
+                getFinishedLeafTasks()
             ]);
-            setTasks(TasksData);
-            setMeetings(MeetingData);
-
-            console.log("Data fetched successfully", TasksData);
         } catch (error) {
-            console.error("Failed to fetch data: ", error);
+            console.error("Failed to fetch tasks: ", error);
         }
     }
 
     useEffect(() => {
-        fetchData()
-    }, [])
+        const fetchData = async () => {
+            await fetchAllTasks();
+        };
+        fetchData();
+    }, []);
 
     useFocusEffect(
         React.useCallback(() => {
+            const fetchData = async () => {
+                await fetchAllTasks();
+            };
             fetchData();
         }, [])
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-            <ScrollView contentContainerStyle={styles.dashboard}>
-                <Text style={styles.dashboardHeader}>儀表板</Text>
-                <View style={styles.dashboardBlock}>
-                    <Text style={styles.dashboardBlockHeader}>進度概要</Text>
+        <View style={styles.container}>
+            <ScrollView contentContainerStyle={styles.content}>
+                <View style={styles.headBar}>
+                    <Pressable onPress={() => setShowModal(true)}>
+                        <Icon name="tune" size={24} />
+                    </Pressable>
+                    <Text style={styles.title}>儀表板</Text>
+                    <Pressable onPress={() => navigation.navigate('Settings')}>
+                        <Icon name="settings" size={24} />
+                    </Pressable>
+                </View>
+                <View style={styles.taskContent}>
+                    <Text style={styles.title}>進行中任務</Text>
                     {
-                        Tasks.length > 0 ? (
-                            Tasks.map((task, index) => (
-                                <View key={index} style={styles.dashboardTaskPreview}>
-                                    <Text style={styles.dashboardTaskPreviewTitle}>{task.TaskName}</Text>
-                                    <Text style={styles.dashboardDate}>{task.EndTime ? new Date(task.EndTime).toLocaleString("zh-TW", {
-                                        year: 'numeric',
-                                        month: '2-digit',
-                                        day: '2-digit',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: true
-                                    }).replace(/\//g, "/") : "無"}</Text>
-                                    <Text style={[styles.dashboardTaskPreviewProgress, { marginTop: "10" }]}>進度</Text>
+                        leafTasks && leafTasks.length > 0 ? (
+                            leafTasks.map((task, index) => (
+                                <View
+                                    key={index}
+                                    style={[
+                                        styles.ongoingTask,
+                                        { backgroundColor: index % 2 === 0 ? '#000' : '#8B0000' }
+                                    ]}
+                                >
+                                    <Text style={styles.taskInfo}>{task.TaskName}</Text>
+                                    <Text style={styles.taskInfo}>{new Date(task.EndTime).toLocaleDateString()}</Text>
                                 </View>
                             ))
                         ) : (
-                            <Text style={styles.dashboardNoTasksText}>目前無待辦事項</Text>
+                            <Text style={styles.tasksNoTasksText}>沒有進行中的任務</Text>
+                        )
+                    }
+                    <View style={{ height: 1, backgroundColor: '#E0E0E0', marginVertical: 10 }} />
+                    <Text style={styles.title}>已完成任務</Text>
+                    {
+                        finishedLeafTasks && finishedLeafTasks.length > 0 ? (
+                            finishedLeafTasks.map((task, index) => (
+                                <View
+                                    key={index}
+                                    style={[
+                                        styles.tasksTaskPreview,
+                                        { backgroundColor: index % 2 === 0 ? '#000' : '#8B0000' }
+                                    ]}
+                                >
+                                    <Text style={styles.taskInfo}>{task.title}</Text>
+                                </View>
+                            ))
+                        ) : (
+                            <Text style={styles.tasksNoTasksText}>沒有已完成的任務</Text>
                         )
                     }
                 </View>
-                <View style={styles.dashboardBlock}>
-                    <Text style={styles.dashboardBlockHeader}>今日任務</Text>
-                    {
-                        (() => {
-                            const todayDate = new Date().toLocaleDateString("zh-TW", { year: 'numeric', month: 'long', day: 'numeric' });
-                            const todayTasks = Tasks.filter(task => {
-                                if (!task.EndTime) return false;
-                                const taskDate = new Date(task.EndTime).toLocaleDateString("zh-TW", { year: 'numeric', month: 'long', day: 'numeric' });
-                                return taskDate === todayDate;
-                            });
-                            return todayTasks.length > 0 ? (
-                                todayTasks.map((task, index) => (
-                                    <View key={index} style={styles.dashboardTaskPreview}>
-                                        <Text style={styles.dashboardTaskPreviewTitle}>{task.TaskName}</Text>
-                                        <Text style={styles.dashboardTaskPreviewProgress}>進度</Text>
-                                    </View>
-                                ))
-                            ) : (
-                                <Text style={styles.dashboardNoTasksText}>今日無待辦事項</Text>
-                            );
-                        })()
-                    }
+            </ScrollView>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showModal}
+                onRequestClose={() => setShowModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>篩選設定</Text>
+                            <Pressable onPress={() => setShowModal(false)}>
+                                <Icon name="close" size={24} color="#333" />
+                            </Pressable>
+                        </View>
+                        <ScrollView style={styles.modalBody}>
+                            <Text style={styles.filterOption}>排序方式</Text>
+                            <Pressable style={styles.filterItem}>
+                                <Text>依截止日期</Text>
+                            </Pressable>
+                            <Pressable style={styles.filterItem}>
+                                <Text>依重要性</Text>
+                            </Pressable>
+                            <Pressable style={styles.filterItem}>
+                                <Text>依預估時間</Text>
+                            </Pressable>
+
+                            <Text style={styles.filterOption}>顯示選項</Text>
+                            <Pressable style={styles.filterItem}>
+                                <Text>顯示已完成任務</Text>
+                            </Pressable>
+                            <Pressable style={styles.filterItem}>
+                                <Text>只顯示今日任務</Text>
+                            </Pressable>
+                        </ScrollView>
+                    </View>
                 </View>
-                <View style={styles.dashboardBlock}>
-                    <Text style={styles.dashboardBlockHeader}>即將到來的會議</Text>
-                    {
-                        (() => {
-                            const today = new Date();
-                            const sevenDaysLater = new Date(today);
-                            sevenDaysLater.setDate(today.getDate() + 7);
-                            const upcomingMeetings = Meetings.filter(meeting => {
-                                if (!meeting.StartTime) return false;
-                                const meetingDate = new Date(meeting.StartTime);
-                                return meetingDate >= today && meetingDate <= sevenDaysLater;
-                            });
-                            return upcomingMeetings.length > 0 ? (
-                                upcomingMeetings.map((meeting, index) => (
-                                    <View key={index} style={styles.dashboardMeetingPreview}>
-                                        <View>
-                                            <Text style={styles.dashboardTaskPreviewTitle}>{meeting.MeetingName}</Text>
-                                            <Text style={styles.dashboardDate}>
-                                                {meeting.StartTime ? new Date(meeting.StartTime).toLocaleString("zh-TW", {
-                                                    year: 'numeric',
-                                                    month: '2-digit',
-                                                    day: '2-digit',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                    hour12: true
-                                                }).replace(/\//g, "/") : "無"}
-                                            </Text>
-                                        </View>
-                                        <Text style={styles.dashboardMeetingDuration}>{meeting.Duration} min</Text>
-                                    </View>
-                                ))
-                            ) : (
-                                <Text style={styles.dashboardNoTasksText}>近期無會議</Text>
-                            );
-                        })()
-                    }
-                </View>
-            </ScrollView >
+            </Modal>
         </View>
     )
 }
-
-export default Dashboard
+export default Dashboard;
