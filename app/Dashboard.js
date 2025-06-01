@@ -67,18 +67,43 @@ const Dashboard = ({ navigation }) => {
                 <View style={styles.taskContent}>
                     <Text style={styles.title}>進行中任務</Text>
                     {
+                        leafTasks && leafTasks.length > 0 && (
+                            <View style={styles.topTask}>
+                                <Text style={styles.topTaskTitle}>{leafTasks[0].TaskName}</Text>
+                                <Text style={styles.topTaskDetail}>任務描述：{leafTasks[0].TaskDetail}</Text>
+                                {
+                                    leafTasks[0].Member &&
+                                    <Text style={styles.memberBadge}>
+                                        {
+                                            leafTasks[0].Member.map((member, index) => (
+                                                <Text key={index}>{member}</Text>
+                                            ))
+                                        }
+                                    </Text>
+                                }
+                                <Text style={styles.taskInfo}>預計所需時間：{leafTasks[0].ExpectedTime / 60} 小時</Text>
+                                <Text style={styles.taskInfo}>截止期限：{new Date(leafTasks[0].EndTime).toLocaleDateString()}</Text>
+                            </View>
+                        )
+                    }
+                    {
                         leafTasks && leafTasks.length > 0 ? (
                             leafTasks.map((task, index) => (
-                                <View
-                                    key={index}
-                                    style={[
-                                        styles.ongoingTask,
-                                        { backgroundColor: index % 2 === 0 ? '#000' : '#8B0000' }
-                                    ]}
-                                >
-                                    <Text style={styles.taskInfo}>{task.TaskName}</Text>
-                                    <Text style={styles.taskInfo}>{new Date(task.EndTime).toLocaleDateString()}</Text>
-                                </View>
+                                <>
+                                    {
+                                        index > 0 &&
+                                        <View
+                                            key={index}
+                                            style={[
+                                                styles.ongoingTask,
+                                                { backgroundColor: index % 2 === 0 ? '#8B0000' : '#000' }
+                                            ]}
+                                        >
+                                            <Text style={styles.taskInfo}>{task.TaskName}</Text>
+                                            <Text style={styles.taskInfo}>{new Date(task.EndTime).toLocaleDateString()}</Text>
+                                        </View>
+                                    }
+                                </>
                             ))
                         ) : (
                             <Text style={styles.tasksNoTasksText}>沒有進行中的任務</Text>
