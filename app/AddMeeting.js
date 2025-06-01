@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // import styles from "./MeetingDetails.styles"
 
-const backend_url = 'http://172.20.10.2:3000';
+const backend_url = 'http://192.168.199.81:3000';
 
 const AddMeeting = ({ route, navigation }) => {
     const { taskID } = route.params || {};

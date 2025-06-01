@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./TaskDetails.styles";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const backend_url = 'http://172.20.10.2:3000'   // For physical phone
+const backend_url = 'http://192.168.199.81:3000'   // For physical phone
 
 const TaskDetails = ({ route, navigation }) => {
     const { taskID } = route.params;
@@ -207,14 +207,28 @@ const TaskDetails = ({ route, navigation }) => {
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>建立時間</Text>
                             <Text style={styles.sectionContent}>
-                                {formatDate(task.CreatedTime)}
+                                {new Date(task.CreatedTime).toLocaleDateString("zh-TW", {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true
+                                }).replace(/\//g, "/")}
                             </Text>
                         </View>
 
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>截止時間</Text>
                             <Text style={styles.sectionContent}>
-                                {formatDate(task.EndTime)}
+                                {new Date(task.EndTime).toLocaleDateString("zh-TW", {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true
+                                }).replace(/\//g, "/")}
                             </Text>
                         </View>
                     </View>
@@ -247,7 +261,7 @@ const TaskDetails = ({ route, navigation }) => {
                         </View>
                     )}
 
-                    {task.Child && task.Child.length > 0 && (
+                    {availableChildren && availableChildren.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>任務細項 ({availableChildren.length})</Text>
                             {availableChildren.map((child, index) => (
@@ -264,7 +278,7 @@ const TaskDetails = ({ route, navigation }) => {
                                         </Text>
                                     </View>
                                     <Icon name="chevron-right" size={24} color="#aaa" style={{ alignSelf: "center", paddingLeft: 10 }} />
-                                </Pressable> 
+                                </Pressable>
                             ))}
                         </View>
                     )}

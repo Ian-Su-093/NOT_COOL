@@ -9,7 +9,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 import styles from "./Home.styles"; // 引入樣式
 
-const backend_url = 'http://172.20.10.2:3000';   // For physical phone
+const backend_url = 'http://192.168.199.81:3000';   // For physical phone
 
 const Home = ({ navigation }) => {
 

@@ -6,7 +6,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import styles from "./Meetings.styles"
 
-const backend_url = 'http://172.20.10.2:3000'   // For physical phone
+const backend_url = 'http://192.168.199.81:3000'   // For physical phone
 
 const Meetings = ({ navigation }) => {
     const [Meetings, setMeetings] = useState([])

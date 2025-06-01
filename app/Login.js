@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './Login.styles';
 
 
-const backend_url = 'http://172.20.10.2:3000'   // For physical phone
+const backend_url = 'http://192.168.199.81:3000'   // For physical phone
 
 export default function Login({ navigation }) {
     const [username, setUsername] = useState('');

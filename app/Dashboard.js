@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from './Dashboard.styles';
 
-const backend_url = 'http://172.20.10.2:3000';
+const backend_url = 'http://192.168.199.81:3000';
 
 const Dashboard = ({ navigation }) => {
     const [leafTasks, setLeafTasks] = useState([]);

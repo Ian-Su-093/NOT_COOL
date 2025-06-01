@@ -26,7 +26,6 @@ const MainTabs = () => (
         <Tab.Screen name="舊儀表板" component={OldDashboardStack} />
         <Tab.Screen name="任務" component={TasksStack} />
         <Tab.Screen name="會議" component={MeetingsStack} />
-        <Tab.Screen name="新會議" component={AddMeeting} />
     </Tab.Navigator>
 )
 
