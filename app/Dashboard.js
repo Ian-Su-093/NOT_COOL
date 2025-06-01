@@ -69,8 +69,25 @@ const Dashboard = ({ navigation }) => {
                     {
                         leafTasks && leafTasks.length > 0 && (
                             <View style={styles.topTask}>
-                                <Text style={styles.topTaskTitle}>{leafTasks[0].TaskName}</Text>
-                                <Text style={styles.topTaskDetail}>任務描述：{leafTasks[0].TaskDetail}</Text>
+                                <View style={styles.topTaskHeader}>
+                                    <View style={styles.topTaskLeftColumn}>
+                                        <Text style={styles.topTaskTitle}>{leafTasks[0].TaskName}</Text>
+                                        <Text style={styles.taskInfo}>預計所需時間：</Text>
+                                        <Text style={styles.taskInfo}>{leafTasks[0].ExpectedTime / 60} 小時</Text>
+                                        <Text style={styles.taskInfo}>截止期限：</Text>
+                                        <Text style={styles.taskInfo}>{new Date(leafTasks[0].EndTime).toLocaleDateString("zh-TW", {
+                                            year: 'numeric',
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        }).replace(/\//g, "/")}</Text>
+                                    </View>
+                                    <View style={styles.topTaskRightColumn}>
+                                        <Text style={styles.topTaskDetail}>{leafTasks[0].TaskDetail}</Text>
+                                    </View>
+                                </View>
                                 {
                                     leafTasks[0].Member &&
                                     <Text style={styles.memberBadge}>
@@ -81,15 +98,13 @@ const Dashboard = ({ navigation }) => {
                                         }
                                     </Text>
                                 }
-                                <Text style={styles.taskInfo}>預計所需時間：{leafTasks[0].ExpectedTime / 60} 小時</Text>
-                                <Text style={styles.taskInfo}>截止期限：{new Date(leafTasks[0].EndTime).toLocaleDateString()}</Text>
                             </View>
                         )
                     }
                     {
                         leafTasks && leafTasks.length > 0 ? (
                             leafTasks.map((task, index) => (
-                                <>
+                                <View key={index}>
                                     {
                                         index > 0 &&
                                         <View
@@ -103,7 +118,7 @@ const Dashboard = ({ navigation }) => {
                                             <Text style={styles.taskInfo}>{new Date(task.EndTime).toLocaleDateString()}</Text>
                                         </View>
                                     }
-                                </>
+                                </View>
                             ))
                         ) : (
                             <Text style={styles.tasksNoTasksText}>沒有進行中的任務</Text>
@@ -142,7 +157,7 @@ const Dashboard = ({ navigation }) => {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>篩選設定</Text>
+                            <Text style={styles.modalTitle}>設定</Text>
                             <Pressable onPress={() => setShowModal(false)}>
                                 <Icon name="close" size={24} color="#333" />
                             </Pressable>
@@ -150,21 +165,21 @@ const Dashboard = ({ navigation }) => {
                         <ScrollView style={styles.modalBody}>
                             <Text style={styles.filterOption}>排序方式</Text>
                             <Pressable style={styles.filterItem}>
-                                <Text>依截止日期</Text>
+                                <Text>Judging</Text>
                             </Pressable>
                             <Pressable style={styles.filterItem}>
-                                <Text>依重要性</Text>
-                            </Pressable>
-                            <Pressable style={styles.filterItem}>
-                                <Text>依預估時間</Text>
+                                <Text>Prospecting</Text>
                             </Pressable>
 
-                            <Text style={styles.filterOption}>顯示選項</Text>
+                            <Text style={styles.filterOption}>主題</Text>
                             <Pressable style={styles.filterItem}>
-                                <Text>顯示已完成任務</Text>
+                                <Text>紅黑</Text>
                             </Pressable>
                             <Pressable style={styles.filterItem}>
-                                <Text>只顯示今日任務</Text>
+                                <Text>綠黃</Text>
+                            </Pressable>
+                            <Pressable style={styles.filterItem}>
+                                <Text>藍橘</Text>
                             </Pressable>
                         </ScrollView>
                     </View>

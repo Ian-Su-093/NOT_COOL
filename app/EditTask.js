@@ -245,7 +245,14 @@ const EditTask = ({ route, navigation }) => {
                         }}
                     />
                 )}
-                <Text style={[styles.input, { marginTop: 10 }]}>截止時間：{endTime.toLocaleString()}</Text>
+                <Text style={[styles.input, { marginTop: 10 }]}>截止時間：{new Date(endTime).toLocaleString("zh-TW", {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }).replace(/\//g, "/")}</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="預計所需時間（分鐘）"

@@ -35,6 +35,20 @@ export default StyleSheet.create({
         padding: 15,
         marginBottom: 20,
     },
+    topTaskHeader: {
+        flexDirection: 'row', // 改為橫向排列
+        justifyContent: 'space-between', // 左右分佈
+        alignItems: 'flex-start', // 頂部對齊
+        marginBottom: 10,
+    },
+    topTaskLeftColumn: {
+        flex: 1, // 佔據左側空間
+        paddingRight: 10, // 與右側保持間距
+    },
+    topTaskRightColumn: {
+        flex: 1, // 佔據右側空間
+        paddingLeft: 10, // 與左側保持間距
+    },
     topTaskTitle: {
         color: '#FFFFFF',
         fontSize: 24,
@@ -47,6 +61,7 @@ export default StyleSheet.create({
         borderRadius: 8,
         minHeight: 160,
         fontSize: 16,
+        padding: 10,
         marginBottom: 10,
     },
     memberBadge: {
@@ -56,7 +71,7 @@ export default StyleSheet.create({
         padding: 5,
         paddingHorizontal: 10,
         borderRadius: 20,
-        alignSelf: 'flex-start',
+        alignSelf: 'flex-end',
     },
     ongoingTask: {
         borderRadius: 8,
