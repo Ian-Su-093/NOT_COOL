@@ -70,6 +70,7 @@ const Tasks = ({ navigation }) => {
     return (
         <View style={{ flex: 1, backgroundColor: "#F0EFF6" }}>
             <ScrollView contentContainerStyle={styles.tasks}>
+                <Text style={styles.tasksHeader}>任務</Text>
                 <View style={styles.panel}>
                     <Pressable style={styles.button} onPress={() => sortedBy === "deadline" ? setSortedBy("expectedTime") : setSortedBy("deadline")}>
                         {sortedBy === "deadline" ? <Text style={styles.buttonText}><Icon name="sort" /> 依截止日期</Text> : <Text style={styles.buttonText}><Icon name="sort" /> 依所需時間</Text>}

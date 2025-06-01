@@ -11,9 +11,6 @@ export default StyleSheet.create({
         backgroundColor: "transparent",
         padding: 10,
     },
-    meetingsCancelText: {
-        color: "#007AFF",
-    },
     meetingsHeader: {
         fontSize: 30,
         fontWeight: "bold",

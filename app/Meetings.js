@@ -50,13 +50,12 @@ const Meetings = ({ navigation }) => {
     return (
         <View style={{ flex: 1, backgroundColor: "#F0EFF6" }}>
             <ScrollView contentContainerStyle={styles.meetings}>
-                <Pressable style={styles.meetingsCancel}>
-                    <Text style={styles.meetingsCancelText}>約時間</Text>
-                </Pressable>
                 <Text style={styles.meetingsHeader}>會議</Text>
                 {
                     Meetings.length > 0 ? (
-                        Meetings.map((meeting, index) => (
+                        Meetings.sort(
+                            (a, b) => new Date(a.StartTime) - new Date(b.StartTime)
+                        ).map((meeting, index) => (
                             <Pressable key={index} onPress={() => navigation.navigate("MeetingDetails", { meeting })}>
                                 <View style={styles.meetingsMeetingPreview}>
                                     <View>
@@ -72,7 +71,7 @@ const Meetings = ({ navigation }) => {
                                             }).replace(/\//g, "/") : "無"}
                                         </Text>
                                     </View>
-                                    <Text style={styles.meetingsMeetingDuration}>{meeting.Duration} min</Text>
+                                    <Text style={styles.meetingsMeetingDuration}>{meeting.Duration / 60} min</Text>
                                     <Icon name="chevron-right" size={30} color="#aaa" style={{ alignSelf: "center", paddingLeft: 10 }} />
                                 </View>
                             </Pressable>

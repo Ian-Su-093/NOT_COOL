@@ -2,128 +2,107 @@ import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text, TextInput, Pressable } from "react-native"
 import { fetchUserTask, fetchTaskGroup } from "@/firebaseAPI"
 import { Picker } from "@react-native-picker/picker"
+import styles from './MeetingDetails.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import styles from "./MeetingDetails.styles"
+// import styles from "./MeetingDetails.styles"
+
+const backend_url = 'http://192.168.199.81:3000';
 
 const MeetingDetails = ({ route, navigation }) => {
-    const { meeting } = route.params
-    const [meetingDetails, setMeetingDetails] = useState(meeting)
-    const [tasks, setTasks] = useState([])
-    const [taskGroup, setTaskGroup] = useState([])
+    const { meetingID } = route.params || {};
 
-    const fetchData = async () => {
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [date, setDate] = useState(new Date());
+    const [expectedTime, setExpectedTime] = useState('');
+    const [showPicker, setShowPicker] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const fetchMeetingDetails = async () => {
+        if (!meetingID) {
+            alert("錯誤", "未找到會議ID，請先選擇會議。");
+            return;
+        }
+
+        setIsLoading(true);
         try {
-            const userID = await AsyncStorage.getItem('userID')
-            const [TasksData, TaskGroupData] = await Promise.all([
-                fetchUserTask(userID),
-                fetchTaskGroup(userID)
-            ])
-            setTasks(TasksData)
-            setTaskGroup(TaskGroupData)
+            const userID = await AsyncStorage.getItem('userID');
+            if (!userID) {
+                alert("錯誤", "未找到用戶ID，請先登入。");
+                return;
+            }
+
+            const res = await fetch(`${backend_url}/users/${userID}/meetings/${meetingID}`);
+            if (res.ok) {
+                const data = await res.json();
+                setTitle(data.MeetingName || '');
+                setDescription(data.Description || '');
+                setDate(new Date(data.StartTime));
+                setExpectedTime(data.ExpectedTime || '');
+            } else {
+                const errorData = await res.json();
+                console.error("Error fetching meeting details: ", errorData);
+                alert("錯誤", "無法獲取會議詳細資料，請稍後再試。");
+            }
         } catch (error) {
-            console.error("Failed to fetch data: ", error)
+            console.error("Failed to fetch meeting details: ", error);
+            alert("錯誤", "無法獲取會議詳細資料，請稍後再試。");
+        } finally {
+            setIsLoading(false);
         }
     }
 
-    useEffect(() => {
-        navigation.setOptions({ title: meetingDetails.MeetingName })
-    }, [meetingDetails])
-
-    useEffect(() => {
-        fetchData()
-    }, [])
-
     return (
-        <View style={{ flex: 1, backgroundColor: "#F0EFF6" }}>
-            <ScrollView contentContainerStyle={styles.mDetails}>
-                <Pressable style={styles.mDetailsCancel} onPress={() => navigation.goBack()}>
-                    <Text style={styles.mDetailsCancelText}>取消</Text>
+        <ScrollView style={styles.container}>
+            <View style={styles.infoBox}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="會議標題"
+                    value={title}
+                    onChangeText={setTitle}
+                />
+                <TextInput
+                    style={styles.inputArea}
+                    placeholder="會議描述"
+                    value={description}
+                    onChangeText={setDescription}
+                />
+                <Pressable style={styles.button} onPress={() => setShowPicker(true)}>
+                    <View><Text style={styles.buttonText}>選擇會議時間</Text></View>
                 </Pressable>
-                <Text style={styles.mDetailsHeader}>編輯會議</Text>
-                <Text style={styles.mDetailsSectionName}>會議資訊</Text>
-                <View style={styles.mDetailsSection}>
-                    <TextInput
-                        style={styles.mDetailsSectionInput}
-                        placeholder={meetingDetails.MeetingName}
-                        value={meetingDetails.MeetingName}
-                        onChangeText={(text) => setMeetingDetails({ ...meetingDetails, MeetingName: text })}
+                {showPicker && (
+                    <DateTimePicker
+                        value={date}
+                        mode="datetime"
+                        display="default"
+                        onChange={(event, date) => {
+                            setShowPicker(false);
+                            if (date) {
+                                setDate(date);
+                            }
+                        }}
                     />
-                    <View style={styles.horizontalLine} />
-                    <TextInput
-                        style={[styles.mDetailsSectionInput, { height: 100, textAlignVertical: "top" }]}
-                        placeholder={meetingDetails.MeetingDetail}
-                        value={meetingDetails.MeetingDetail}
-                        onChangeText={(text) => setMeetingDetails({ ...meetingDetails, MeetingDetail: text })}
-                        multiline={true}
-                        numberOfLines={4}
-                    />
-                    <View style={styles.horizontalLine} />
-                    <Text>
-                        {meetingDetails.StartTime ? new Date(meetingDetails.StartTime).toLocaleString("zh-TW", {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
-                        }).replace(/\//g, "/") : "無"}
-                    </Text>
-                    <View style={styles.horizontalLine} />
-                    <View style={styles.mDetailsTime}>
-                        {/* <Text>會議時長：{meetingDetails.Duration} 分鐘</Text> */}
-                        <View style={styles.mDetailsTimeBtn}>
-                            <Text>會議時長：</Text>
-                            <TextInput
-                                defaultValue={meetingDetails.Duration.toString()}
-                                onEndEditing={
-                                    (e) => {
-                                        const value = parseInt(e.nativeEvent.text, 10)
-                                        if (!isNaN(value) && value > 0) {
-                                            setMeetingDetails({ ...meetingDetails, Duration: value })
-                                        } else {
-                                            setMeetingDetails({ ...meetingDetails })
-                                        }
-                                    }
-                                }
-                                keyboardType="numeric"
-                            />
-                            <Text> 分鐘</Text>
-                        </View>
-                        <View style={styles.mDetailsTimeBtn}>
-                            <Pressable onPress={() => setMeetingDetails({ ...meetingDetails, Duration: meetingDetails.Duration > 1 ? meetingDetails.Duration - 1 : 1 })}>
-                                <Text style={styles.mDetailsDecreaseBtn}> - </Text>
-                            </Pressable>
-                            <Pressable onPress={() => setMeetingDetails({ ...meetingDetails, Duration: meetingDetails.Duration + 1 })}>
-                                <Text style={styles.mDetailsIncreaseBtn}> + </Text>
-                            </Pressable>
-                        </View>
-                    </View>
-                </View>
-                <Text style={styles.mDetailsSectionName}>選擇專案</Text>
-                <Text style={styles.mDetailsSectionName}>關聯任務 (選填)</Text>
-                <View style={[styles.mDetailsSection]}>
-                    <Text style={styles.mDetailsDropdownLabel}>選擇任務：</Text>
-                    <Picker
-                        selectedValue={meetingDetails.TaskID}
-                        //WARNING: This should not change the TaskID of the meeting
-                        // onValueChange={(itemValue) => setMeetingDetails({ ...meetingDetails, TaskID: itemValue })}
-                        style={styles.mDetailsDropdown}
-                    >
-                        <Picker.Item label="無關聯任務" value={null} style={{ color: "#888" }} />
-                        {tasks
-                            .filter((task) => task.TaskID !== meetingDetails.TaskID)
-                            .map((task) => (
-                                <Picker.Item key={task.TaskID} label={task.TaskName} value={task.TaskID} style={{ color: "#888" }} />
-                            ))}
-                    </Picker>
-                </View>
-                <Pressable>
-                    <Text style={styles.mDetailsSave}>更新會議</Text>
-                </Pressable>
-            </ScrollView>
-        </View>
-    )
+                )}
+                <Text style={[styles.input, { marginTop: 10 }]}>會議時間：{date.toLocaleDateString("zh-TW", {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }).replace(/\//g, "/")}</Text>
+
+                <TextInput
+                    style={styles.lastInput}
+                    placeholder="預計所需時間（分鐘）"
+                    value={expectedTime}
+                    keyboardType="numeric"
+                    onChangeText={setExpectedTime}
+                />
+            </View>
+        </ScrollView>
+    );
 }
 
-export default MeetingDetails
+export default MeetingDetails;

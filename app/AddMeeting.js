@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text, TextInput, Pressable } from "react-native"
 import { fetchUserTask, fetchTaskGroup } from "@/firebaseAPI"
 import { Picker } from "@react-native-picker/picker"
-import styles from './AddTask.styles';
+import styles from './AddMeeting.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // import styles from "./MeetingDetails.styles"
@@ -57,7 +57,6 @@ const AddMeeting = ({ route, navigation }) => {
             if (response.ok) {
                 const data = await response.json();
                 console.log("會議提交成功:", data);
-                alert('新增會議成功！');
 
 
                 setTitle('');
@@ -117,7 +116,14 @@ const AddMeeting = ({ route, navigation }) => {
                         }}
                     />
                 )}
-                <Text style={[styles.input, { marginTop: 10 }]}>會議時間：{date.toLocaleString()}</Text>
+                <Text style={[styles.input, { marginTop: 10 }]}>會議時間：{date.toLocaleDateString("zh-TW", {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }).replace(/\//g, "/")}</Text>
 
                 <TextInput
                     style={styles.lastInput}

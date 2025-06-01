@@ -6,6 +6,11 @@ export default StyleSheet.create({
         padding: 20,
         paddingTop: 60,
     },
+    tasksHeader: {
+        fontSize: 30,
+        fontWeight: "bold",
+        marginBottom: 20,
+    },
     panel: {
         flexDirection: "row",
         justifyContent: "space-between",

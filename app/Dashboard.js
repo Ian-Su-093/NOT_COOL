@@ -115,7 +115,14 @@ const Dashboard = ({ navigation }) => {
                                             ]}
                                         >
                                             <Text style={styles.taskInfo}>{task.TaskName}</Text>
-                                            <Text style={styles.taskInfo}>{new Date(task.EndTime).toLocaleDateString()}</Text>
+                                            <Text style={styles.taskInfo}>{new Date(task.EndTime).toLocaleDateString("zh-TW", {
+                                                year: 'numeric',
+                                                month: '2-digit',
+                                                day: '2-digit',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                hour12: true
+                                            }).replace(/\//g, "/")}</Text>
                                         </View>
                                     }
                                 </View>

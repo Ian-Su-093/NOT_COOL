@@ -6,6 +6,11 @@ export default StyleSheet.create({
         padding: 20,
         backgroundColor: '#FFF',
     },
+    content: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingBottom: 200,
+    },
     infoBox: {
         marginBottom: 20,
         paddingHorizontal: 20,

@@ -1,91 +1,76 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-    mDetails: {
-        backgroundColor: "#F0EFF6",
+    container: {
+        flex: 1,
         padding: 20,
-        paddingTop: 60,
+        backgroundColor: '#FFF',
     },
-    mDetailsCancel: {
-        alignSelf: "flex-end",
-        backgroundColor: "transparent",
-        padding: 10,
+    infoBox: {
+        marginBottom: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        backgroundColor: '#F0EFF6',
+        borderRadius: 10,
     },
-    mDetailsCancelText: {
-        color: "#007AFF",
+    input: {
+        height: 60,
+        // borderColor: '#ccc',
+        // borderWidth: 1,
+        borderBottomWidth: 0.5,
+        borderColor: '#aaa',
+        marginBottom: 10,
+        paddingHorizontal: 10,
     },
-    mDetailsHeader: {
-        fontSize: 30,
-        fontWeight: "bold",
+    inputArea: {
+        height: 180,
+        // borderColor: '#ccc',
+        // borderWidth: 1,
+        borderBottomWidth: 0.5,
+        borderColor: '#aaa',
+        marginBottom: 30,
+        paddingHorizontal: 10,
+        textAlignVertical: 'top',
+    },
+    button: {
+        height: 60,
+        backgroundColor: '#007AFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 8,
         marginBottom: 20,
     },
-    mDetailsSectionName: {
-        fontSize: 12,
-        color: "#888",
+    buttonDisabled: {
+        opacity: 0.6,
+    },
+    buttonText: {
+        color: '#FFF',
+        fontSize: 16,
+    },
+    memberList: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginBottom: 20,
+    },
+    memberItem: {
+        backgroundColor: '#B5E2FF',
+        padding: 10,
+        borderRadius: 20,
+        marginRight: 10,
         marginBottom: 10,
     },
-    mDetailsSection: {
-        backgroundColor: "#FFFFFF",
+    lastInput: {
+        height: 60,
+        // borderColor: '#ccc',
+        // borderWidth: 1,
+        borderColor: '#aaa',
+        marginBottom: 30,
+        paddingHorizontal: 10,
+    },
+    submitButton: {
+        backgroundColor: '#6200EE',
+        color: '#FFF',
+        padding: 15,
         borderRadius: 8,
-        padding: 20,
-        marginBottom: 40,
-    },
-    horizontalLine: {
-        borderBottomWidth: 1,
-        borderBottomColor: "#E0E0E0",
-        marginVertical: 15,
-    },
-    mDetailsSectionInput: {
-        marginVertical: -10,
-    },
-    mDetailsTime: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    mDetailsTimeBtn: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    mDetailsDecreaseBtn: {
-        backgroundColor: "#E5E5E5",
-        fontWeight: "bold",
-        fontSize: 20,
-        color: "#000",
-        paddingVertical: 3,
-        paddingHorizontal: 15,
-        paddingLeft: 17,
-        borderTopLeftRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderRightWidth: 1,
-        marginVertical: -3,
-    },
-    mDetailsIncreaseBtn: {
-        backgroundColor: "#E5E5E5",
-        fontWeight: "bold",
-        fontSize: 20,
-        color: "#000",
-        paddingVertical: 3,
-        paddingHorizontal: 14,
-        paddingRight: 13,
-        borderTopRightRadius: 10,
-        borderBottomRightRadius: 10,
-        marginVertical: -3,
-    },
-    mDetailsDropdown: {
-        color: "#888",
-        borderRadius: 8,
-        padding: 10,
-    },
-    mDetailsSave: {
-        backgroundColor: "#007AFF",
-        color: "#FFFFFF",
-        padding: 10,
-        textAlign: "center",
-        borderRadius: 8,
-        fontSize: 18,
     },
 })

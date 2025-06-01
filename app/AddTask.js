@@ -149,80 +149,82 @@ const AddTask = ({ route, navigation }) => {
     }, [parentTaskID]);
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.infoBox}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="任務名稱"
-                    value={taskName}
-                    onChangeText={setTaskName}
-                />
-                <TextInput
-                    style={styles.inputArea}
-                    placeholder="任務描述"
-                    value={taskDetail}
-                    onChangeText={setTaskDetail}
-                />
-                <Pressable style={styles.button} onPress={() => setShowPicker(true)}>
-                    <View><Text style={styles.buttonText}>選擇截止時間</Text></View>
-                </Pressable>
-                {showPicker && (
-                    <DateTimePicker
-                        value={endTime}
-                        mode="datetime"
-                        display="default"
-                        onChange={(event, date) => {
-                            setShowPicker(false);
-                            if (date) {
-                                setEndTime(date);
-                            }
-                        }}
+        <View style={styles.container}>
+            <ScrollView contentContainerStyle={styles.content}>
+                <View style={styles.infoBox}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="任務名稱"
+                        value={taskName}
+                        onChangeText={setTaskName}
                     />
-                )}
-                <Text style={[styles.input, { marginTop: 10 }]}>截止時間：{endTime.toLocaleString()}</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="預計所需時間（分鐘）"
-                    value={expectedTime}
-                    keyboardType="numeric"
-                    onChangeText={setExpectedTime}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="重要性 (1-10)"
-                    value={penalty}
-                    keyboardType="numeric"
-                    onChangeText={setPenalty}
-                />
-                {
-                    memberList.length > 0 && (
-                        <View style={styles.memberList}>
-                            {memberList.map((member, index) => (
-                                <Pressable key={index} onPress={() => {
-                                    setMemberList(memberList.filter(m => m !== member));
-                                }}>
-                                    <View>
-                                        <Text style={styles.memberItem}>{member}</Text>
-                                    </View>
-                                </Pressable>
-                            ))}
-                        </View>
-                    )
-                }
-                <TextInput
-                    style={styles.lastInput}
-                    placeholder="新增成員"
-                    value={newMember}
-                    onChangeText={setNewMember}
-                />
-                <Pressable style={styles.button} onPress={() => appendMember()}>
-                    <View><Text style={styles.buttonText}>新增成員</Text></View>
+                    <TextInput
+                        style={styles.inputArea}
+                        placeholder="任務描述"
+                        value={taskDetail}
+                        onChangeText={setTaskDetail}
+                    />
+                    <Pressable style={styles.button} onPress={() => setShowPicker(true)}>
+                        <View><Text style={styles.buttonText}>選擇截止時間</Text></View>
+                    </Pressable>
+                    {showPicker && (
+                        <DateTimePicker
+                            value={endTime}
+                            mode="datetime"
+                            display="default"
+                            onChange={(event, date) => {
+                                setShowPicker(false);
+                                if (date) {
+                                    setEndTime(date);
+                                }
+                            }}
+                        />
+                    )}
+                    <Text style={[styles.input, { marginTop: 10 }]}>截止時間：{endTime.toLocaleString()}</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="預計所需時間（分鐘）"
+                        value={expectedTime}
+                        keyboardType="numeric"
+                        onChangeText={setExpectedTime}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="重要性 (1-10)"
+                        value={penalty}
+                        keyboardType="numeric"
+                        onChangeText={setPenalty}
+                    />
+                    {
+                        memberList.length > 0 && (
+                            <View style={styles.memberList}>
+                                {memberList.map((member, index) => (
+                                    <Pressable key={index} onPress={() => {
+                                        setMemberList(memberList.filter(m => m !== member));
+                                    }}>
+                                        <View>
+                                            <Text style={styles.memberItem}>{member}</Text>
+                                        </View>
+                                    </Pressable>
+                                ))}
+                            </View>
+                        )
+                    }
+                    <TextInput
+                        style={styles.lastInput}
+                        placeholder="新增成員"
+                        value={newMember}
+                        onChangeText={setNewMember}
+                    />
+                    <Pressable style={styles.button} onPress={() => appendMember()}>
+                        <View><Text style={styles.buttonText}>新增成員</Text></View>
+                    </Pressable>
+                </View>
+                <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleSubmit} disabled={isLoading}>
+                    <View><Text style={styles.buttonText}>新增</Text></View>
                 </Pressable>
-            </View>
-            <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleSubmit} disabled={isLoading}>
-                <View><Text style={styles.buttonText}>新增</Text></View>
-            </Pressable>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }
 
