@@ -92,11 +92,11 @@ const Dashboard = ({ navigation }) => {
                                 <View
                                     key={index}
                                     style={[
-                                        styles.tasksTaskPreview,
+                                        styles.finishedTask,
                                         { backgroundColor: index % 2 === 0 ? '#000' : '#8B0000' }
                                     ]}
                                 >
-                                    <Text style={styles.taskInfo}>{task.title}</Text>
+                                    <Text style={styles.taskInfo}>{task.TaskName}</Text>
                                 </View>
                             ))
                         ) : (

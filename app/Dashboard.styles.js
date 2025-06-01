@@ -44,7 +44,12 @@ export default StyleSheet.create({
         color: '#FFFFFF',
     },
     finishedTask: {
+        borderRadius: 8,
+        padding: 20,
         marginBottom: 20,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
 
 
