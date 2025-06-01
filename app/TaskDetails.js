@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./TaskDetails.styles";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const backend_url = 'http://192.168.199.81:3000'   // For physical phone
+const backend_url = 'http://172.20.10.2:3000'   // For physical phone
 
 const TaskDetails = ({ route, navigation }) => {
     const { taskID } = route.params;
