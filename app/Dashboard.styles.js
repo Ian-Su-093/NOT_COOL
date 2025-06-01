@@ -40,16 +40,28 @@ export default StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    taskInfo: {
-        color: '#FFFFFF',
+    taskGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
     },
     finishedTask: {
         borderRadius: 8,
-        padding: 20,
-        marginBottom: 20,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        padding: 15,
+        marginBottom: 15,
+        width: '48%', // 讓每個卡片佔據約一半寬度
+        minHeight: 60,
+    },
+    taskInfo: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        marginBottom: 4,
+    },
+    tasksNoTasksText: {
+        textAlign: 'center',
+        color: '#666',
+        fontStyle: 'italic',
+        width: '100%', // 確保無任務文字佔滿整行
     },
 
 

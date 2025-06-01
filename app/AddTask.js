@@ -45,7 +45,7 @@ const AddTask = ({ route, navigation }) => {
                 EndTime: endTime.toISOString(),
                 ExpectedTime: parseInt(expectedTime) * 60,
                 Penalty: parseInt(penalty),
-                Parent: parentTaskID || null,
+                ...(parentTaskID ? { Parent: parentTaskID } : {}),
             };
 
             console.log('提交的任務數據:', taskData);

@@ -86,23 +86,25 @@ const Dashboard = ({ navigation }) => {
                     }
                     <View style={{ height: 1, backgroundColor: '#E0E0E0', marginVertical: 10 }} />
                     <Text style={styles.title}>已完成任務</Text>
-                    {
-                        finishedLeafTasks && finishedLeafTasks.length > 0 ? (
-                            finishedLeafTasks.map((task, index) => (
-                                <View
-                                    key={index}
-                                    style={[
-                                        styles.finishedTask,
-                                        { backgroundColor: index % 2 === 0 ? '#000' : '#8B0000' }
-                                    ]}
-                                >
-                                    <Text style={styles.taskInfo}>{task.TaskName}</Text>
-                                </View>
-                            ))
-                        ) : (
-                            <Text style={styles.tasksNoTasksText}>沒有已完成的任務</Text>
-                        )
-                    }
+                    <View style={styles.taskGrid}>
+                        {
+                            finishedLeafTasks && finishedLeafTasks.length > 0 ? (
+                                finishedLeafTasks.map((task, index) => (
+                                    <View
+                                        key={index}
+                                        style={[
+                                            styles.finishedTask,
+                                            { backgroundColor: (index + 1) % 4 >= 2 ? '#000' : '#8B0000' }
+                                        ]}
+                                    >
+                                        <Text style={styles.taskInfo}>{task.TaskName}</Text>
+                                    </View>
+                                ))
+                            ) : (
+                                <Text style={styles.tasksNoTasksText}>沒有已完成的任務</Text>
+                            )
+                        }
+                    </View>
                 </View>
             </ScrollView>
 
