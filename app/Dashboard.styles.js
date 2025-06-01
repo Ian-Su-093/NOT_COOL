@@ -72,6 +72,7 @@ export default StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 20,
         alignSelf: 'flex-end',
+        marginTop: 10,
     },
     ongoingTask: {
         borderRadius: 8,

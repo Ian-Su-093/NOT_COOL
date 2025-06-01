@@ -56,7 +56,7 @@ const Meetings = ({ navigation }) => {
                         Meetings.sort(
                             (a, b) => new Date(a.StartTime) - new Date(b.StartTime)
                         ).map((meeting, index) => (
-                            <Pressable key={index} onPress={() => navigation.navigate("MeetingDetails", { meeting })}>
+                            <Pressable key={index} onPress={() => navigation.navigate("MeetingDetails", { meetingID: meeting.MeetingID })}>
                                 <View style={styles.meetingsMeetingPreview}>
                                     <View>
                                         <Text style={styles.meetingsMeetingPreviewTitle}>{meeting.MeetingName}</Text>

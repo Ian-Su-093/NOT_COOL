@@ -12,6 +12,7 @@ const Dashboard = ({ navigation }) => {
     const [leafTasks, setLeafTasks] = useState([]);
     const [finishedLeafTasks, setFinishedLeafTasks] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [arrangeBy, setArrangeBy] = useState(0);
 
     const getLeafTasks = async () => {
         const userID = await AsyncStorage.getItem('userID');
@@ -36,9 +37,69 @@ const Dashboard = ({ navigation }) => {
         }
     }
 
+    const fetchArrangeBy = async () => {
+        try {
+            const userID = await AsyncStorage.getItem('userID');
+            const res = await fetch(`${backend_url}/users/${userID}/arrange`);
+            if (!res.ok) {
+                throw new Error('Failed to fetch arrange by');
+            }
+            const data = await res.json();
+            setArrangeBy(data.arrange);
+            console.log("Fetched arrange by: ", data.arrange);
+        } catch (error) {
+            console.error("Failed to fetch arrange by: ", error);
+        }
+    }
+
+    const handleArrangeByChange = async (value) => {
+        setArrangeBy(value);
+        console.log("Arrange by changed to: ", value);
+        try {
+            const userID = await AsyncStorage.getItem('userID');
+            const res = await fetch(`${backend_url}/users/${userID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Arrange: value })
+            });
+            if (!res.ok) {
+                throw new Error('Failed to update arrange by');
+            } else {
+                console.log("Arrange by updated successfully");
+            }
+        } catch (error) {
+            console.error("Failed to update arrange by: ", error);
+            return;
+        }
+        setShowModal(false);
+
+        try {
+            const userID = await AsyncStorage.getItem('userID');
+            const res = await fetch(`${backend_url}/users/${userID}/schedule`);
+            const data = (await res.json()).result;
+            console.log("Fetched updated tasks: ", data);
+            setLeafTasks([]);
+            for (const taskID of data) {
+                console.log("Fetching task with ID: ", taskID);
+                const taskRes = await fetch(`${backend_url}/tasks/${taskID}`);
+                const taskData = await taskRes.json();
+                console.log("Fetched task data: ", taskData);
+                setLeafTasks(prevTasks => [...prevTasks, taskData.task]);
+            }
+            console.log("Updated tasks fetched successfully");
+        } catch (error) {
+            console.error("Failed to fetch updated tasks: ", error);
+        }
+    }
+
     useEffect(() => {
         const fetchData = async () => {
-            await fetchAllTasks();
+            // await fetchAllTasks();
+            await getFinishedLeafTasks();
+            await fetchArrangeBy();
+            await handleArrangeByChange(arrangeBy);
         };
         fetchData();
     }, []);
@@ -47,6 +108,7 @@ const Dashboard = ({ navigation }) => {
         React.useCallback(() => {
             const fetchData = async () => {
                 await fetchAllTasks();
+                await fetchArrangeBy();
             };
             fetchData();
         }, [])
@@ -90,13 +152,11 @@ const Dashboard = ({ navigation }) => {
                                 </View>
                                 {
                                     leafTasks[0].Member &&
-                                    <Text style={styles.memberBadge}>
-                                        {
-                                            leafTasks[0].Member.map((member, index) => (
-                                                <Text key={index}>{member}</Text>
-                                            ))
-                                        }
-                                    </Text>
+                                    leafTasks[0].Member.map((member, index) => (
+                                        <Text key={index} style={styles.memberBadge}>
+                                            <Text>{member}</Text>
+                                        </Text>
+                                    ))
                                 }
                             </View>
                         )
@@ -171,11 +231,20 @@ const Dashboard = ({ navigation }) => {
                         </View>
                         <ScrollView style={styles.modalBody}>
                             <Text style={styles.filterOption}>排序方式</Text>
-                            <Pressable style={styles.filterItem}>
+                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(1)}>
                                 <Text>Judging</Text>
                             </Pressable>
-                            <Pressable style={styles.filterItem}>
+                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(2)}>
                                 <Text>Prospecting</Text>
+                            </Pressable>
+                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(3)}>
+                                <Text>依截止日期</Text>
+                            </Pressable>
+                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(4)}>
+                                <Text>依重要性</Text>
+                            </Pressable>
+                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(5)}>
+                                <Text>依最短所需時間</Text>
                             </Pressable>
 
                             <Text style={styles.filterOption}>主題</Text>
