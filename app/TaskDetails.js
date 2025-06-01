@@ -272,7 +272,7 @@ const TaskDetails = ({ route, navigation }) => {
                     <Pressable style={styles.editButton} onPress={() => navigation.navigate('EditTask', { taskID: task.TaskID })}>
                         <Text style={styles.editButtonText}>編輯任務</Text>
                     </Pressable>
-                    <Pressable style={styles.addButton}>
+                    <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddMeeting', { taskID: task.TaskID })}>
                         <Text style={styles.addButtonText}>新增會議</Text>
                     </Pressable>
                     <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddTask', { parentTaskID: task.TaskID })}>

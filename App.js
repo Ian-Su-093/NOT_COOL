@@ -13,6 +13,7 @@ import MeetingDetails from './app/MeetingDetails'
 import Tasks from './app/Tasks'
 import TaskDetails from './app/TaskDetails'
 import AddTask from './app/AddTask'
+import AddMeeting from './app/AddMeeting'
 import EditTask from './app/EditTask'
 import Settings from './app/Settings'
 
@@ -25,6 +26,7 @@ const MainTabs = () => (
         <Tab.Screen name="舊儀表板" component={OldDashboardStack} />
         <Tab.Screen name="任務" component={TasksStack} />
         <Tab.Screen name="會議" component={MeetingsStack} />
+        <Tab.Screen name="新會議" component={AddMeeting} />
     </Tab.Navigator>
 )
 
@@ -69,6 +71,7 @@ const App = () => {
                 <Stack.Screen name="AddTask" component={AddTask} options={{ headerShown: true, title: '新增任務' }} />
                 <Stack.Screen name="EditTask" component={EditTask} options={{ headerShown: true, title: '編輯任務' }} />
                 <Stack.Screen name="Settings" component={Settings} options={{ headerShown: true, title: '設定' }} />
+                <Stack.Screen name="AddMeeting" component={AddMeeting} options={{ headerShown: true, title: '新增會議' }} />
             </Stack.Navigator>
         </NavigationContainer>
     )
