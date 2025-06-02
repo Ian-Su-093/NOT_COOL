@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react"
 import { ScrollView, View, Text, TextInput, Pressable } from "react-native"
 import styles from './MeetingDetails.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import { getLocalIP } from "./util/helpers";
 // import styles from "./MeetingDetails.styles"
 
-const backend_url = 'http://192.168.199.81:3000';
+const backend_url = `http://${getLocalIP()}:3000`;
 
 const MeetingDetails = ({ route, navigation }) => {
     const { meetingID } = route.params || {};

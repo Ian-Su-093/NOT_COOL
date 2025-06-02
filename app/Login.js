@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './Login.styles';
+import { getLocalIP } from "./util/helpers";
 
-
-const backend_url = 'http://192.168.199.81:3000'   // For physical phone
+const backend_url = `http://${getLocalIP()}:3000`;   // For physical phone
 
 export default function Login({ navigation }) {
     const [username, setUsername] = useState('');

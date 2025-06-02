@@ -3,10 +3,10 @@ import { ScrollView, View, Text, Pressable } from "react-native"
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from "@react-navigation/native";
-
+import { getLocalIP } from "./util/helpers";
 import styles from "./Meetings.styles"
 
-const backend_url = 'http://192.168.199.81:3000'   // For physical phone
+const backend_url = `http://${getLocalIP()}:3000`;   // For physical phone
 
 const Meetings = ({ navigation }) => {
     const [Meetings, setMeetings] = useState([])

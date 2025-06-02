@@ -4,8 +4,8 @@ import { ScrollView, View, Text, Pressable } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./TaskDetails.styles";
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-const backend_url = 'http://192.168.199.81:3000'   // For physical phone
+import { getLocalIP } from "./util/helpers";
+const backend_url = `http://${getLocalIP()}:3000`;   // For physical phone
 
 const TaskDetails = ({ route, navigation }) => {
     const { taskID } = route.params;

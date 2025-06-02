@@ -3,10 +3,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, ScrollView, Pressable, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { getLocalIP } from "./util/helpers";
 import styles from './Dashboard.styles';
 
-const backend_url = 'http://192.168.199.81:3000';
+const backend_url = `http://${getLocalIP()}:3000`;
 
 const Dashboard = ({ navigation }) => {
     const [leafTasks, setLeafTasks] = useState([]);

@@ -3,8 +3,8 @@ import { View, Text, TextInput, ScrollView, Pressable } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import styles from './EditTask.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const backend_url = 'http://192.168.199.81:3000';
+import { getLocalIP } from "./util/helpers";
+const backend_url = `http://${getLocalIP()}:3000`;
 
 const EditTask = ({ route, navigation }) => {
     const { taskID } = route.params || {};

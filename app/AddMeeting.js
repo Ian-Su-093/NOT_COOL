@@ -3,10 +3,10 @@ import { ScrollView, View, Text, TextInput, Pressable } from "react-native"
 import DateTimePicker from '@react-native-community/datetimepicker';
 import styles from './AddMeeting.styles';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import { getLocalIP } from "./util/helpers";
 // import styles from "./MeetingDetails.styles"
 
-const backend_url = 'http://192.168.199.81:3000';
+const backend_url = `http://${getLocalIP()}:3000`;
 
 const AddMeeting = ({ route, navigation }) => {
     const { taskID } = route.params || {};
