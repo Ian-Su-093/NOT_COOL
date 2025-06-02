@@ -12,7 +12,7 @@ const Dashboard = ({ navigation }) => {
     const [leafTasks, setLeafTasks] = useState([]);
     const [finishedLeafTasks, setFinishedLeafTasks] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [arrangeBy, setArrangeBy] = useState(0);
+    const [arrangeBy, setArrangeBy] = useState(-1);
 
     const getLeafTasks = async () => {
         const userID = await AsyncStorage.getItem('userID');
@@ -70,7 +70,10 @@ const Dashboard = ({ navigation }) => {
     };
 
     const handleArrangeByChange = async (value) => {
-        setArrangeBy(value);
+        // setArrangeBy(value);
+        if (value === -1) {
+            return;
+        }
         console.log("Arrange by changed to: ", value);
         try {
             const userID = await AsyncStorage.getItem('userID');
@@ -254,19 +257,19 @@ const Dashboard = ({ navigation }) => {
                         </View>
                         <ScrollView style={styles.modalBody}>
                             <Text style={styles.filterOption}>排序方式</Text>
-                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(1)}>
+                            <Pressable style={styles.filterItem} onPress={() => setArrangeBy(1)}>
                                 <Text>Judging</Text>
                             </Pressable>
-                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(2)}>
+                            <Pressable style={styles.filterItem} onPress={() => setArrangeBy(2)}>
                                 <Text>Prospecting</Text>
                             </Pressable>
-                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(3)}>
+                            <Pressable style={styles.filterItem} onPress={() => setArrangeBy(3)}>
                                 <Text>依截止日期</Text>
                             </Pressable>
-                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(4)}>
+                            <Pressable style={styles.filterItem} onPress={() => setArrangeBy(4)}>
                                 <Text>依重要性</Text>
                             </Pressable>
-                            <Pressable style={styles.filterItem} onPress={() => handleArrangeByChange(5)}>
+                            <Pressable style={styles.filterItem} onPress={() => setArrangeBy(5)}>
                                 <Text>依最短所需時間</Text>
                             </Pressable>
 
