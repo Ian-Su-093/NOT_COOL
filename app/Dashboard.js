@@ -77,7 +77,7 @@ const Dashboard = ({ navigation }) => {
 
         try {
             const userID = await AsyncStorage.getItem('userID');
-            const res = await fetch(`${backend_url}/users/${userID}/schedule`);
+            const res = await fetch(`${backend_url}/users/${userID}/schedule/?alg=${arrangeBy}`);
             const data = (await res.json()).result;
             console.log("Fetched updated tasks: ", data);
             setLeafTasks([]);

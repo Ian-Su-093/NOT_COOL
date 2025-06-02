@@ -40,19 +40,17 @@ const EditTask = ({ route, navigation }) => {
             }
 
             const taskData = {
-                UserID: userID,
                 TaskName: taskName,
                 TaskDetail: taskDetail,
                 EndTime: endTime.toISOString(),
                 ExpectedTime: parseInt(expectedTime) * 60,
                 Penalty: parseInt(penalty),
-                Parent: parentTaskID || null,
             };
 
             console.log('提交的任務數據:', taskData);
 
-            const response = await fetch(`${backend_url}/tasks`, {
-                method: 'POST',
+            const response = await fetch(`${backend_url}/tasks/${taskID}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -188,10 +186,11 @@ const EditTask = ({ route, navigation }) => {
                 const taskData = (await response.json()).task;
                 setTaskName(taskData.TaskName);
                 setTaskDetail(taskData.TaskDetail);
-                setEndTime(new Date(taskData.EndTime));
+                setEndTime(new Date(taskData.EndTime.seconds * 1000));
                 setExpectedTime((taskData.ExpectedTime / 60).toString());
                 setPenalty(taskData.Penalty.toString());
                 setParentTaskID(taskData.Parent);
+                console.log(taskData);
                 // if (taskData.Members) {
                 //     setMemberList(taskData.Members.map(member => member.Username));
                 // }
@@ -246,7 +245,7 @@ const EditTask = ({ route, navigation }) => {
                             }}
                         />
                     )}
-                    <Text style={[styles.input, { marginTop: 10 }]}>截止時間：{new Date(endTime).toLocaleString("zh-TW", {
+                    <Text style={[styles.input, { marginTop: 10 }]}>截止時間：{endTime.toLocaleString("zh-TW", {
                         year: 'numeric',
                         month: '2-digit',
                         day: '2-digit',

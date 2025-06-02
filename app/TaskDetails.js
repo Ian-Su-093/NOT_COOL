@@ -207,7 +207,7 @@ const TaskDetails = ({ route, navigation }) => {
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>建立時間</Text>
                             <Text style={styles.sectionContent}>
-                                {new Date(task.CreatedTime).toLocaleDateString("zh-TW", {
+                                {new Date(task.CreatedTime.seconds * 1000).toLocaleDateString("zh-TW", {
                                     year: 'numeric',
                                     month: '2-digit',
                                     day: '2-digit',
@@ -221,7 +221,7 @@ const TaskDetails = ({ route, navigation }) => {
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>截止時間</Text>
                             <Text style={styles.sectionContent}>
-                                {new Date(task.EndTime).toLocaleDateString("zh-TW", {
+                                {new Date(task.EndTime.seconds * 1000).toLocaleDateString("zh-TW", {
                                     year: 'numeric',
                                     month: '2-digit',
                                     day: '2-digit',
