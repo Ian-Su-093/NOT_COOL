@@ -52,6 +52,23 @@ const Dashboard = ({ navigation }) => {
         }
     }
 
+    const convertFirestoreTimestamp = (timestamp) => {
+        if (!timestamp) return null;
+
+        // 如果已經是 Date 對象
+        if (timestamp instanceof Date) return timestamp;
+
+        // 如果是 ISO 字符串
+        if (typeof timestamp === 'string') return new Date(timestamp);
+
+        // 如果是 Firestore Timestamp 對象
+        if (timestamp.seconds !== undefined) {
+            return new Date(timestamp.seconds * 1000);
+        }
+
+        return null; // 如果都不是，返回 null
+    };
+
     const handleArrangeByChange = async (value) => {
         setArrangeBy(value);
         console.log("Arrange by changed to: ", value);
@@ -99,10 +116,16 @@ const Dashboard = ({ navigation }) => {
             // await fetchAllTasks();
             await getFinishedLeafTasks();
             await fetchArrangeBy();
-            await handleArrangeByChange(arrangeBy);
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        const refresh = async () => {
+            await handleArrangeByChange(arrangeBy);
+        }
+        refresh();
+    }, [arrangeBy]);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -137,7 +160,7 @@ const Dashboard = ({ navigation }) => {
                                         <Text style={styles.taskInfo}>預計所需時間：</Text>
                                         <Text style={styles.taskInfo}>{leafTasks[0].ExpectedTime / 60} 小時</Text>
                                         <Text style={styles.taskInfo}>截止期限：</Text>
-                                        <Text style={styles.taskInfo}>{new Date(leafTasks[0].EndTime).toLocaleDateString("zh-TW", {
+                                        <Text style={styles.taskInfo}>{convertFirestoreTimestamp(leafTasks[0].EndTime).toLocaleDateString("zh-TW", {
                                             year: 'numeric',
                                             month: '2-digit',
                                             day: '2-digit',
@@ -175,7 +198,7 @@ const Dashboard = ({ navigation }) => {
                                             ]}
                                         >
                                             <Text style={styles.taskInfo}>{task.TaskName}</Text>
-                                            <Text style={styles.taskInfo}>{new Date(task.EndTime).toLocaleDateString("zh-TW", {
+                                            <Text style={styles.taskInfo}>{convertFirestoreTimestamp(task.EndTime).toLocaleDateString("zh-TW", {
                                                 year: 'numeric',
                                                 month: '2-digit',
                                                 day: '2-digit',
