@@ -1,50 +1,87 @@
-# Welcome to your Expo app 👋
+# 📋 To-Do List App (Frontend)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## 📝 Description
 
-## Get started
+A simple and responsive to-do list mobile application built with **React Native**. This app allows users to add, complete, and delete tasks and meetings. This is the **frontend only** part of the app, intended to connect to a backend API.
 
-1. Install dependencies
+---
 
+## 🚀 Features
+
+- Add, edit, and delete tasks
+- Create a tree-like structure for your tasks
+- Mark tasks as completed
+- Clean and minimal UI
+- Cross-platform support (iOS and Android)
+
+---
+
+## 🧱 Tech Stack
+
+- React Native
+- Expo
+- React Navigation
+- AsyncStorage
+- Fetch
+
+---
+
+## 🔧 Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Ian-Su-093/NOT_COOL
+   cd NOT_COOL
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Run the app**
    ```bash
-    npx expo start
+   npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+## ⚙️ Configuration
+Set up local server IP
+```js
+// app/util/helper.js
+export function getLocalIP() {
+  return '192.168.1.10'; // Replace with your actual local IP address
+}
 ```
+💡 You can find your local IP by running ipconfig (Windows) or ifconfig / ip a (macOS/Linux) in your terminal.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 📁 Project Structure
+```
+NOT_COOL/
+├── App.js # 主應用程式入口點和導航設定
+├── app.json # Expo 配置文件
+├── package.json # 專案依賴和腳本
+├── babel.config.js # Babel 編譯配置
+├── tsconfig.json # TypeScript 配置
+├── app/
+│ ├── util/
+│ │ └── helpers.js # 工具函數（IP 配置等）
+│ ├── notifications.js # 推播通知設定
+│ ├── Login.js # 登入頁面
+│ ├── SignUp.js # 註冊頁面
+│ ├── Dashboard.js # 儀表板主頁
+│ ├── Tasks.js # 任務列表頁面
+│ ├── TaskDetails.js # 任務詳情頁面
+│ ├── AddTask.js # 新增任務頁面
+│ ├── EditTask.js # 編輯任務頁面
+│ ├── Meetings.js # 會議列表頁面
+│ ├── MeetingDetails.js # 會議詳情頁面
+│ ├── AddMeeting.js # 新增會議頁面
+│ ├── EditMeeting.js # 編輯會議頁面
+│ ├── Settings.js # 設定頁面
+│ └── *.styles.js # 各頁面對應的樣式文件
+└── assets/ # 圖片和靜態資源
+```

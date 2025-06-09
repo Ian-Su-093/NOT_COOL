@@ -6,7 +6,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import Login from './app/Login'
 import SignUp from './app/SignUp'
-import Home from './app/Home'
 import Dashboard from './app/Dashboard'
 import Tasks from './app/Tasks'
 import TaskDetails from './app/TaskDetails'
@@ -27,12 +26,6 @@ const MainTabs = () => (
         <Tab.Screen name="任務" component={TasksStack} />
         <Tab.Screen name="會議" component={MeetingsStack} />
     </Tab.Navigator>
-)
-
-const HomeStack = () => (
-    <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-    </Stack.Navigator>
 )
 
 const DashboardStack = () => (
