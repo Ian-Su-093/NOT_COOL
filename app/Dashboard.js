@@ -161,7 +161,7 @@ const Dashboard = ({ navigation }) => {
                                     <View style={styles.topTaskLeftColumn}>
                                         <Text style={styles.topTaskTitle}>{leafTasks[0].TaskName}</Text>
                                         <Text style={styles.taskInfo}>預計所需時間：</Text>
-                                        <Text style={styles.taskInfo}>{leafTasks[0].ExpectedTime / 60} 小時</Text>
+                                        <Text style={styles.taskInfo}>{leafTasks[0].ExpectedTime / 60} 分鐘</Text>
                                         <Text style={styles.taskInfo}>截止期限：</Text>
                                         <Text style={styles.taskInfo}>{convertFirestoreTimestamp(leafTasks[0].EndTime).toLocaleDateString("zh-TW", {
                                             year: 'numeric',

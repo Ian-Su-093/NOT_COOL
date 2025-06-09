@@ -6,42 +6,42 @@ import { getLocalIP } from "./util/helpers";
 
 const backend_url = `http://${getLocalIP()}:3000`;   // For physical phone
 
-export default function Login({ navigation }) {
+export default function SignUp({ navigation }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async () => {
+    const handleSignUp = async () => {
         try {
             const uid = await fetch(`${backend_url}/users/by-username/${username}`);
-            const userID = (await uid.json()).UserID;
-            const res = await fetch(`${backend_url}/login`, {
+            if (uid.status === 200) {
+                alert('Username already exists. Please choose a different username.');
+                return;
+            }
+            const res = await fetch(`${backend_url}/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ UserID: userID, Password: password }),
+                body: JSON.stringify({ UserName: username, Password: password }),
             });
             const data = await res.json();
             console.log(data.success);
             console.log(data.message);
-
             if (data.success) {
-                // 導航到主要的 Tab Navigator
-                await AsyncStorage.setItem('userID', userID);
-                await AsyncStorage.setItem('username', username);
-                navigation.navigate('MainTabs');
+                alert('Sign up successful! You can now log in.');
+                navigation.navigate('Login');
             } else {
-                alert('Login failed. Please check your username.');
+                alert('Sign up failed. Please try again.');
             }
         } catch (error) {
-            console.error('Login error:', error);
-            alert('Login failed. Please try again.');
+            console.error('Sign up error:', error);
+            alert('Sign up failed. Please try again.');
         }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Sign Up</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Username"
@@ -57,9 +57,9 @@ export default function Login({ navigation }) {
                 value={password}
                 onChangeText={setPassword}
             />
-            <Button title="登入" onPress={handleLogin} />
-            <Pressable onPress={() => navigation.navigate('SignUp')}>
-                <Text style={{ color: 'blue', marginTop: 30, textAlign: "center" }}>沒有帳號？註冊</Text>
+            <Button title="註冊" onPress={handleSignUp} />
+            <Pressable onPress={() => navigation.navigate('Login')}>
+                <Text style={{ color: 'blue', marginTop: 30, textAlign: "center" }}>已有帳號？登入</Text>
             </Pressable>
         </View>
     );

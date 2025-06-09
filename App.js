@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import Login from './app/Login'
+import SignUp from './app/SignUp'
 import Home from './app/Home'
 import Dashboard from './app/Dashboard'
 import Tasks from './app/Tasks'
@@ -59,6 +60,7 @@ const App = () => {
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="SignUp" component={SignUp} />
                 <Stack.Screen name="MainTabs" component={MainTabs} />
                 <Stack.Screen name="AddTask" component={AddTask} options={{ headerShown: true, title: '新增任務' }} />
                 <Stack.Screen name="EditTask" component={EditTask} options={{ headerShown: true, title: '編輯任務' }} />
